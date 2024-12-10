@@ -1,8 +1,8 @@
-# Advent Of Code 2024 (in Picat http://picat-lang.org/ )
+# [Advent Of Code 2024](https://adventofcode.com/2024/) (in [Picat Language](http://picat-lang.org/) )
 
-I learn this language, so I need to use the user guide http://picat-lang.org/download/picat_guide.pdf every time.
+I learn this language during the competition, so I need to use the [Picat user guide](http://picat-lang.org/download/picat_guide.pdf) every time.
 
-It is derived from Prolog, so it makes backtracking easy, but it also supports efficient search with integration of SAT and CP engines.
+Picat is derived from Prolog, so it makes backtracking easy, but it also supports efficient search with integration of SAT and CP engines.
 
 Other repos to look at for the AOC2024 solutions in Picat:
 
