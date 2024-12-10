@@ -1,0 +1,26 @@
+import util.
+
+incr([]).
+incr([X]).
+incr([X,Y|L]):-X<=Y,incr([Y|L]).
+
+decr([]).
+decr([X]).
+decr([X,Y|L]):-X>=Y,decr([Y|L]).
+
+goodvar([]).
+goodvar([X]).
+goodvar([X,Y|L]):-abs(X-Y)>=1,abs(X-Y)<=3,goodvar([Y|L]).
+
+
+main=>
+    L=read_file_lines("in.txt"),
+    S:=0,
+    foreach(I in 1..L.length),
+        C:=split(L[I]),
+        L1:=[to_int(A):A in C],
+        ((incr(L1)||decr(L1)),goodvar(L1),S:=S+1;
+        true
+        )        
+    end,
+    print(S).

@@ -1,0 +1,55 @@
+import util.
+%import regex.
+
+
+cs(L)=[0|cs(L,0)]=>true.
+cs([X],Acc)=[X+Acc]=>true.
+cs([H|T],Acc)=[H+Acc|cs(T,Acc+H)]=>true.
+
+main=>
+    L=read_file_lines("in.txt"),
+    L:=[X:X in L[1]].map(to_int),
+    CS={X: X in cs(L)},
+    L:={X:X in L},
+    B:={{L[2*I-1],CS[2*I-1],I-1}:I in 1..L.length//2+1},
+    S:={{L[2*I],CS[2*I]}:I in 1..L.length//2},    
+    N=L.sum,
+    Occ:={0:_ in 1..N},
+    foreach (I in 1..B.length)
+        foreach (J in 1..B[I,1])
+            Occ[B[I,2]+J]:=I
+        end
+    end,
+    SpaceIdx=1,
+    BlockIdx=B.length,
+    Is:=S[SpaceIdx,2],
+    Ib:=B[BlockIdx,2]+B[BlockIdx,1]-1,
+    println(Occ),
+    println({L,B,S,L.sum,CS}),
+    foreach(I0 in 1..B.length)
+        I:=B.length+1-I0,
+        println(I),
+        Ax:=[J:J in 1..S.length,S[J,1]>=B[I,1]],
+        %println(Ax),
+        if Ax!=[] then
+            Is:=Ax[1],
+            %println(Is),
+            if S[Is,2]<B[I,2] then
+                println({move,Occ[B[I,2]+1]-1,x,B[I,1],=>,S[Is,2]}),
+                foreach(J in 1..B[I,1])
+                    %println({S[Is,2]+J,B[I,2]+J}),
+                    Occ[S[Is,2]+J]:=Occ[B[I,2]+J],
+                    Occ[B[I,2]+J]:=0,
+                end,
+                S[Is,2]:=S[Is,2]+B[I,1],
+                S[Is,1]:=S[Is,1]-B[I,1],
+            end
+        end,
+        %println(Occ),
+    end,
+    println({X-1: X in Occ,X>0}),    
+    Res=[(I-1)*B[Occ[I],3]:I in 1..Occ.length,Occ[I]>0].sum,
+    println(Res).
+
+
+    

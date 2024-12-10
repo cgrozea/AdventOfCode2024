@@ -1,0 +1,31 @@
+import util.
+
+incr([]).
+incr([X]).
+incr([X,Y|L]):-X<=Y,incr([Y|L]).
+
+decr([]).
+decr([X]).
+decr([X,Y|L]):-X>=Y,decr([Y|L]).
+
+goodvar([]).
+goodvar([X]).
+goodvar([X,Y|L]):-abs(X-Y)>=1,abs(X-Y)<=3,goodvar([Y|L]).
+
+safe(L1):-(incr(L1)||decr(L1)),goodvar(L1).
+safe1([H|T],L):-safe(reverse(L)++T).
+safe1([H|T],L):-safe1(T,[H|L]).
+
+
+
+main=>    
+    L=read_file_lines("in.txt"),
+    S:=0,
+    foreach(I in 1..L.length)
+        C:=split(L[I]),
+        L1:=[to_int(A):A in C],
+        ((safe(L1);safe1(L1,[])),S:=S+1;
+        true
+        )        
+    end,
+    println(S).

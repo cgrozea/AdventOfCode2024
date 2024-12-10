@@ -1,0 +1,41 @@
+import util.
+%import regex.
+
+main=>
+    L=read_file_lines("in.txt"),
+    A=L.flatten.new_set.keys,
+    L:={{Y:Y in X}:X in L},
+    M=L.length,
+    N=L[1].length,
+    S=new_map(),
+    foreach(X in A)
+        if X!='.' then
+            S.put(X,[])
+        end
+    end,
+    foreach(I in 1..M,J in 1..N),
+        if L[I,J]!='.' then
+            S.put(L[I,J],[(I,J)|S.get(L[I,J])])
+        end
+    end,    
+    !,
+%    println(S),
+    P:=[(X[1]-F/G*(Y[1]-X[1]),X[2]-F/G*(Y[2]-X[2]))
+    :K in A, 
+    K!='.',
+    X in S.get(K),
+    Y in S.get(K),
+    X!=Y,
+    F in 0..N,
+    G in 1..1,
+    isint(X[1]-F/G*(Y[1]-X[1])),
+    isint(X[2]-F/G*(Y[2]-X[2])),
+    X[1]-F/G*(Y[1]-X[1])>=1,
+    X[1]-F/G*(Y[1]-X[1])<=M,
+    X[2]-F/G*(Y[2]-X[2])>=1,
+    X[2]-F/G*(Y[2]-X[2])<=N
+    ].new_set.keys,
+    println(P.length).
+
+isint(X):-(X.to_int-X).abs<0.001.
+    

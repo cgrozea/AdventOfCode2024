@@ -1,0 +1,17 @@
+%https://gist.github.com/joebo/c0c56f41c610eb04370b
+import util.
+main=>
+    L=read_file_lines("in.txt"),
+    L1:=[],L2:=[],
+    foreach(I in 1..L.length),
+        C:=split(L[I]),
+        L1:=[to_int(C[1])|L1],L2:=[to_int(C[2])|L2]
+    end,
+    L1:=sort(L1),L2:=sort(L2),
+    S:=0,
+    foreach(I in 1..L.length),
+    S:=S+L1[I]*[X:X in L2,X==L1[I]].length
+    end,
+    print(S).
+
+

@@ -1,0 +1,26 @@
+import util.
+import regex.
+
+ev(X)=Y=>regex_find_all("\\d+",X,L),Y=to_int(L[1])*to_int(L[2]).
+
+filter1([],L,_)=R=>R=reverse(L).
+filter1([d,o,n,'\'',t|R],L,_)=S=>filter1(R,L,0)=S.
+filter1([d,o|R],L,_)=S=>filter1(R,L,1)=S.
+filter1([H|T],L,1)=filter1(T,[H|L],1)=>true.
+filter1([H|T],L,0)=filter1(T,L,0)=>true.
+
+main=>
+    L=read_file_lines("in.txt"),
+    S:="",
+    foreach(I in 1..L.length),
+        S:=S++"/"++L[I]
+    end,
+    println(S),
+    S:=filter1(S,[],1),
+    println(S),
+    regex_find_all("mul\\(\\d+,\\d+\\)",S,X),
+    println(X),
+    map(ev,X)=X2,
+    println(X2),
+    sum(X2)=Res,
+    println(Res).

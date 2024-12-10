@@ -1,0 +1,31 @@
+import util.
+import regex.
+
+main=>
+    L=read_file_lines("in.txt"),
+    %println(L),
+    M:=L.length,N:=L[1].length,
+    println([M,N]),
+    I:=[I:I in 1..M, member('^',L[I])], I:=I[1],
+    println(I),
+    J:=[J:J in 1..N, L[I,J]='^'],J:=J[1],
+    println(J),
+    L[I,J]:='x',
+    %println(L),
+    R:=0-1,C:=0,
+    while (member(I,1..M), member(J,1..N)) 
+        %println([I,J,R,C]),
+        I2:=I+R,J2:=J+C,
+        if (member(I2,1..M) , member(J2,1..N)) then
+            if L[I2,J2]!='#' then
+                I:=I2,J:=J2,L[I,J]:='x'
+            else
+                AX:=C,C:=0-R,R:=AX
+            end 
+        else
+            I:=I2,J:=J2
+        end
+    end,   
+    Rez:=[[1:'x' in A].sum:A in L].sum,
+    println(Rez).
+    

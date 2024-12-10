@@ -1,0 +1,24 @@
+import util.
+import regex.
+
+
+valid_sequence(L,Before),L.length<=1=>true.
+valid_sequence([H|T],Before)=>foreach(X in T) Before[H,X]>=1 end,valid_sequence(T,Before).
+
+
+middle_elem(L)=X=>I:=to_int((L.length+1)/2),println(I),X=L[I].
+%middle_elem(L)=1=>true.
+
+
+main=>
+    L=read_file_lines("in0.txt"),
+    S:=0,
+    Before:={{2:I in 1..100}:J in 1..100},
+    foreach(A in L),
+        (
+         member('|',A),regex_find_all("\\d+",A,X),X:=X.map(to_int),Before[X[1],X[2]]:=1,Before[X[2],X[1]]:=0;
+         member(',',A),A:=A.split(",").map(to_int),valid_sequence(A,Before),X:=middle_elem(A),S:=S+X;
+         true
+        )
+    end,
+    println(S).

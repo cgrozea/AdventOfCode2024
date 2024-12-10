@@ -1,0 +1,29 @@
+import util.
+import regex.
+
+inside(L)=0,L.length<=3=>true.
+inside(['X','M','A','S'|T])=inside(T)+1.
+inside([H|T])=inside(T).
+
+diags(A,I,J)=1,I+3<=A.length,J+3<=A[1].length,W=[A[I+K,J+K]:K in 0..3],
+    (W="XMAS";W="SAMX")=>true.
+diags(_,_,_)=0.
+diags(A)=[diags(A,I,J):I in 1..A.length,J in 1..A.length].sum.
+
+main=>
+    L=read_file_lines("in1.txt"),    
+    println(L),
+    S:=0,
+    S:=S+L.map(inside).sum,
+    S:=S+L.transpose.map(inside).sum,
+    S:=S+L.map(reverse).map(inside).sum,
+    S:=S+L.transpose.map(reverse).map(inside).sum,
+    S:=S+diags(L),
+    S:=S+diags(L.map(reverse)),
+    println(S).
+    
+main2=>
+    L=read_file_lines("in0.txt"),
+    diags(L,1,1)=S,
+    println(S).
+    

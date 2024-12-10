@@ -1,0 +1,52 @@
+import util.
+%import regex.
+
+
+cs(L)=[0|cs(L,0)]=>true.
+cs([X],Acc)=[X+Acc]=>true.
+cs([H|T],Acc)=[H+Acc|cs(T,Acc+H)]=>true.
+
+main=>
+    L=read_file_lines("in.txt"),
+    L:=[X:X in L[1]].map(to_int),
+    CS={X: X in cs(L)},
+    L:={X:X in L},
+    B:={{L[2*I-1],CS[2*I-1],I-1}:I in 1..L.length//2+1},
+    S:={{L[2*I],CS[2*I]}:I in 1..L.length//2},    
+    N=L.sum,
+    Occ:={0:_ in 1..N},
+    foreach (I in 1..B.length)
+        foreach (J in 1..B[I,1])
+            Occ[B[I,2]+J]:=I
+        end
+    end,
+    SpaceIdx=1,
+    BlockIdx=B.length,
+    Is:=S[SpaceIdx,2],
+    Ib:=B[BlockIdx,2]+B[BlockIdx,1]-1,
+    println(Occ),
+    println({L,B,S,L.sum,CS}),
+    while(Is<Ib)
+        println({Is,Ib}),
+        Occ[Is+1]:=Occ[Ib+1],
+        Lis:=Is+1,
+        Occ[Ib+1]:=0,
+        Ib:=Ib-1,
+        Is:=Is+1,
+        while (Is>=S[SpaceIdx,2]+S[SpaceIdx,1])
+            SpaceIdx:=SpaceIdx+1,
+            Is:=S[SpaceIdx,2],
+        end,
+        while (Ib<B[BlockIdx,2])
+            BlockIdx:=BlockIdx-1,
+            Ib:=B[BlockIdx,2]+B[BlockIdx,1]-1
+        end,
+        %println(Occ)
+    end,
+    println({X-1: X in Occ,X>0}),
+    println({Is,Ib}),
+    Res=[(I-1)*B[Occ[I],3]:I in 1..Occ.length,Occ[I]>0].sum,
+    println(Res).
+
+
+    

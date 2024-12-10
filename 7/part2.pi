@@ -1,0 +1,23 @@
+import util.
+%import regex.
+
+conc2(A,B)=to_int(to_string(A)++to_string(B))=>true.
+
+ok([H],Z),H=Z=>true.
+ok([H|T],Z)=>ok(H,T,Z).
+ok(A,[],Z)=>A=Z.
+ok(A,[H|T],Z)?=>ok(A*H,T,Z),!.
+ok(A,[H|T],Z)?=>ok(A+H,T,Z),!.
+ok(A,[H|T],Z)=>ok(conc2(A,H),T,Z).
+
+
+main=>
+    L=read_file_lines("in.txt"),
+    L:=[X.split(":"):X in L].transpose,
+    A:=L[1].map('to_int'),
+    B:=[X.split(" ").map(to_int):X in L[2]],
+    S:=[A[I]:I in 1..A.length,println(I),ok(B[I],A[I])].sum,
+    println(S).
+
+
+    

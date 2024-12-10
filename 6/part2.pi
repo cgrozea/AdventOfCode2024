@@ -1,0 +1,52 @@
+import util.
+import regex.
+
+cyclic(L,M,N,I,J):-
+    %println(L),
+    R:=0-1,C:=0,
+    S:=0,
+    while (member(I,1..M), member(J,1..N), S<N*M) 
+        %println([I,J,R,C]),
+        I2:=I+R,J2:=J+C,
+        if (member(I2,1..M) , member(J2,1..N)) then
+            if L[I2,J2]!='#' then
+                I:=I2,J:=J2,S:=S+1
+            else
+                AX:=C,C:=0-R,R:=AX
+            end 
+        else
+            I:=I2,J:=J2
+        end        
+    end,
+    if (member(I,1..M), member(J,1..N)) then
+        true
+    else
+        false
+    end.
+
+
+
+
+main=>
+    L=read_file_lines("in.txt"),
+    %println(L),
+    M:=L.length,N:=L[1].length,
+    println([M,N]),
+    I:=[I:I in 1..M, member('^',L[I])], I:=I[1],
+    println(I),
+    J:=[J:J in 1..N, L[I,J]='^'],J:=J[1],
+    println(J),
+    S:=0,
+    foreach (A in 1..M,B in 1..N)
+    print([A,B]),
+    if (L[A,B]='.') then
+    L[A,B]:='#',
+    if cyclic(L,M,N,I,J) then
+        println("*"),
+        S:=S+1,
+    end,
+    L[A,B]:='.'
+    end
+    end,
+    println(S).
+    

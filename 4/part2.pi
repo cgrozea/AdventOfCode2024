@@ -1,0 +1,13 @@
+import util.
+import regex.
+
+diags(A,I,J)=1,I+2<=A.length,J+2<=A[1].length,W=[A[I,J],A[I,J+2],A[I+1,J+1],A[I+2,J],A[I+2,J+2]],member(W,["MMASS","SSAMM","MSAMS","SMASM"])=>true.
+diags(_,_,_)=0.
+diags(A)=[diags(A,I,J):I in 1..A.length,J in 1..A.length].sum.
+
+main=>
+    L=read_file_lines("in1.txt"),    
+    println(L),
+    S:=diags(L),
+    println(S).
+    
