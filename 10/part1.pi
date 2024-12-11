@@ -1,0 +1,19 @@
+import util.
+%import regex.
+
+main([File])=>
+    A=read_file_lines(File),
+    %A:=[X.map(to_int):X in A], %slightly slower
+    A:=[X.map(to_int).to_array:X in A].to_array,
+    N:=A.length,
+    Scores=[reached(N,A,I,J,0).length:I in 1..N,J in 1..N,A[I,J]=0],
+    println(Scores.sum)
+    .
+        
+reached(N,A,I,J,_)=[],(not between(1,N,I);not between(1,N,J))=>true.
+reached(N,A,I,J,K)=[],A[I,J]!=K=>true.
+reached(N,A,I,J,9)=[(I,J)].
+reached(N,A,I,J,K)=new_set(reached(N,A,I-1,J,K+1)++reached(N,A,I+1,J,K+1)++reached(N,A,I,J-1,K+1)++reached(N,A,I,J+1,K+1)).keys.
+
+
+    
