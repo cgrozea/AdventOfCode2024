@@ -1,0 +1,19 @@
+import util.
+%import regex.
+
+
+main([File,N])=>
+    L=read_file_lines(File), L:=L[1].split.map(to_int),
+    foreach (_ in 1..N.to_int),
+    L:=e(L),
+    end,
+    println(L.length)
+    .
+e([])=[].
+e([0|T])=[1|e(T)].
+e([X|T])=[A,B|e(T)],even(X.to_string.length)=>
+    S=X.to_string,
+    A=to_int([S[I]:I in 1..S.length//2]),
+    B=to_int([S[I]:I in S.length//2+1..S.length]).
+e([X|T])=[2024*X|e(T)].
+

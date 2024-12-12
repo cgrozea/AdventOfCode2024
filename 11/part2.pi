@@ -1,0 +1,19 @@
+import util.
+%import regex.
+
+
+main([File,N])=>
+    L=read_file_lines(File), L:=L[1].split.map(to_int),
+    L:=[e(A,N.to_int):A in L],
+    println(L.sum)
+    .
+
+table
+e(X,0)=1.
+e(0,N)=e(1,N-1).
+e(X,N)=e(A,N-1)+e(B,N-1),even(X.to_string.length)=>
+    println({X,N}),
+    S=X.to_string,
+    A=to_int([S[I]:I in 1..S.length//2]),
+    B=to_int([S[I]:I in S.length//2+1..S.length]).
+e(X,N)=e(2024*X,N-1).
