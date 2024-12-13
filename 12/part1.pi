@@ -1,0 +1,50 @@
+import util.
+%import regex.
+
+
+
+main([File])=>
+    A=read_file_lines(File), 
+    A:=A.map(to_array).to_array,
+    N:=A.length,
+    println(N),
+    R:={{-1:_ in 1..N}:_ in 1..N},
+    K:=0,
+    foreach (I in 1..N),
+    foreach (J in 1..N),
+    if R[I,J]= -1 then
+        K:=K+1,
+        f(A,N,R,I,J,K,A[I,J])
+    end,
+    end,
+    end,
+    p(A),
+    p(R),
+    S:=[[cond(R[I,J]=B,1,0):I in 1..N,J in 1..N].sum:B in 1..K],
+    G:={{h(A,N,R,I,J,K):J in 1..N}:I in 1..N}
+    ,p(G)
+    ,P:=[[cond(R[I,J]=B,G[I,J],0):I in 1..N,J in 1..N].sum:B in 1..K]
+    ,println({S,P})
+    ,Z:=[S[I]*P[I]:I in 1..K].sum
+    ,println(Z)
+    .
+
+f(A,N,R,I,J,K,V),I>=1,I<=N,J>=1,J<=N,R[I,J]= -1,A[I,J]=V?=>
+    R[I,J]:=K,
+    f(A,N,R,I+1,J,K,V),
+    f(A,N,R,I-1,J,K,V),
+    f(A,N,R,I,J-1,K,V),
+    f(A,N,R,I,J+1,K,V).
+f(_,_,_,_,_,_,_)=>true.
+
+
+g(A,N,R,I,J,K,V)=1,(I<1;I>N;J<1;J>N)=>true.
+g(A,N,R,I,J,K,V)=1,R[I,J]!=V=>true.
+g(A,N,R,I,J,K,V)=0.
+
+h(A,N,R,I,J,K)=g(A,N,R,I-1,J,K,R[I,J])+g(A,N,R,I+1,J,K,R[I,J])+g(A,N,R,I,J-1,K,R[I,J])+g(A,N,R,I,J+1,K,R[I,J])=>true.
+
+
+p(R):-foreach (I in 1..R.length)println(R[I])end,println(-----).
+
+
