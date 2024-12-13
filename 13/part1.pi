@@ -1,0 +1,32 @@
+import util.
+import regex.
+import cp.
+
+%Button A: X+94, Y+34
+%Button B: X+22, Y+67
+%Prize: X=8400, Y=5400
+
+main([File])=>
+    A=read_file_lines(File), 
+    AX:=0,AY:=0,BX:=0,BY:=0,TX:=0,TY:=0,S:=0,
+    foreach(L in A)
+        %println({l,L}),
+        if member('A',L) then
+            regex_find_all("\\d+",L,XY),XY:=XY.map(to_int),AX:=XY[1]+0,AY:=XY[2]
+        end,
+        if member('B',L) then
+            regex_find_all("\\d+",L,XY),XY:=XY.map(to_int),BX:=XY[1],BY:=XY[2]
+        end,
+        if member('P',L) then 
+            regex_find_all("\\d+",L,XY),XY:=XY.map(to_int),TX:=XY[1],TY:=XY[2],
+            println({AX,AY,BX,BY,TX,TY}),
+            S:=S+p(AX,AY,BX,BY,TX,TY),
+            println(----------------------------)
+        end
+    end
+    ,println(S)
+    ,true.
+
+p(AX,AY,BX,BY,TX,TY)=S=>(A::0..100,B::0..100,TX#=A*AX+B*BX,TY#=A*AY+B*BY,S#=3*A+B,solve([$min(S)],[A,B,S]),!;S=0).
+
+%main([_])=>S=p(94,34,22,67,8400,5400),println(S).
