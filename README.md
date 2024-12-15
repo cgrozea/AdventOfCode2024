@@ -1,4 +1,4 @@
-# [Advent Of Code 2024](https://adventofcode.com/2024/) - My solutions in [Picat Language](http://picat-lang.org/)
+# [Advent Of Code 2024](https://adventofcode.com/2024/) - My solutions in the [Picat Language](http://picat-lang.org/)
 
 I learn this language during the competition, so I need to use the [Picat user guide](http://picat-lang.org/download/picat_guide.pdf) every time.
 
