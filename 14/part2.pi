@@ -1,0 +1,39 @@
+import util.
+%import regex.
+
+q1({X,Y},W,T)=1,X<W//2,Y<T//2=>true.
+q1({X,Y},W,T)=0.
+q2({X,Y},W,T)=1,X>W//2,Y<T//2=>true.
+q2({X,Y},W,T)=0.
+q3({X,Y},W,T)=1,X>W//2,Y>T//2=>true.
+q3({X,Y},W,T)=0.
+q4({X,Y},W,T)=1,X<W//2,Y>T//2=>true.
+q4({X,Y},W,T)=0.
+
+%p=0,4 v=3,-3
+p(L)=R=>append(C,D,L),append("p="++X,","++Y,C),append(" v="++U,","++V,D),!,R=[X,Y,U,V].map(to_int).to_array.
+
+sim({X,Y,U,V},S,W,T)={(X+S*U) mod W,(Y+S*V) mod T}=>true.
+
+
+q(R,W,T)=P=>P={{0:J in 1..W}:I in 1..T},
+    foreach({X,Y} in R) 
+        P[Y+1,X+1]:=1 
+    end.
+
+pp(P)=>foreach (X in P) foreach(Y in X) print(cond(Y==0,'0 ','1 ')) end, print("\n") end.
+
+main([File,W, T, MD])=>
+    A=[p(L): L in read_file_lines(File)], 
+    W:=W.to_int,T:=T.to_int
+    ,MD:=MD.to_int
+    ,between(0,MD,D)
+    ,EP=[sim(X,D,W,T):X in A]
+    ,Img=q(EP,W,T)
+%    ,println({d,D})
+    ,pp(Img)
+    ,fail.
+    .
+
+    
+

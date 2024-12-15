@@ -1,0 +1,35 @@
+import util.
+%import regex.
+
+q1({X,Y},W,T)=1,X<W//2,Y<T//2=>true.
+q1({X,Y},W,T)=0.
+q2({X,Y},W,T)=1,X>W//2,Y<T//2=>true.
+q2({X,Y},W,T)=0.
+q3({X,Y},W,T)=1,X>W//2,Y>T//2=>true.
+q3({X,Y},W,T)=0.
+q4({X,Y},W,T)=1,X<W//2,Y>T//2=>true.
+q4({X,Y},W,T)=0.
+
+%p=0,4 v=3,-3
+p(L)=R=>append(C,D,L),append("p="++X,","++Y,C),append(" v="++U,","++V,D),!,R=[X,Y,U,V].map(to_int).to_array.
+
+sim({X,Y,U,V},S,W,T)={(X+S*U) mod W,(Y+S*V) mod T}=>true.
+
+
+main([File,D, W, T])=>
+    A=[p(L): L in read_file_lines(File)], 
+    N=A.length,
+    println(A),
+    println([{X,Y}:{X,Y,_,_} in A]),
+    W:=W.to_int,T:=T.to_int
+    ,D:=D.to_int
+    ,EP=[sim(X,D,W,T):X in A]
+    ,println(EP)
+    ,R=[q1(X,W,T):X in EP].sum*[q2(X,W,T):X in EP].sum*[q3(X,W,T):X in EP].sum*[q4(X,W,T):X in EP].sum
+    ,println([q1(X,W,T):X in EP])
+    ,println([q2(X,W,T):X in EP])
+    ,println([q3(X,W,T):X in EP])
+    ,println([q4(X,W,T):X in EP])
+    ,println(R)    
+    .
+main2=>println(q2({6,3},11,7)).
