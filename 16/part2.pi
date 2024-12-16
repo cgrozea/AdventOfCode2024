@@ -1,0 +1,71 @@
+import aoc.
+
+final({A,R,C,Dr,Dc})=>A[R,C]='E'.
+
+
+action({A,R,C,Dr,Dc},S,M,P)=>(
+    between(1,A.length,R+Dr),between(1,A.length,C+Dc),A[R+Dr,C+Dc]!='#',S={A,R+Dr,C+Dc,Dr,Dc},M=c,P=1;
+    S={A,R,C,Dc,-Dr},M=l,P=1000;
+    S={A,R,C,-Dc,Dr},M=r,P=1000
+    ).
+
+table(+,min)
+%cost(S,Cost),S={A,R,C,Dc,Dr}?=>println({R,C,A[R,C],Cost}),fail.
+cost(S,C),final(S)=>C=0.
+cost(S,C)=>action(S,S2,_,P),cost(S2,C1),C=C1+P.
+
+final2({A,R,C,Dr,Dc})=>A[R,C]='S',Dr=0,Dc= -1.
+
+table(+,min)
+%rost(S,C),S={A,R,C,Dc,Dr}?=>println({R,C,A[R,C]}),fail.
+rost(S,C),final2(S)=>C=0.
+rost(S,C)=>action(S,S2,_,P),rost(S2,C1),C=C1+P.    
+    
+    
+fc(S)=R=>cost(S,R).
+fr(S)=R=>rost(S,R).
+    
+main([F|T])=>
+A=rcm(F)
+,pc(A)
+%,println({A.length,A[1].length})
+,N=A.length
+,IX=[{I,J}:I in 1..N,J in 1..N,A[I,J]='S'],{R0,C0}=IX[1]
+,IX:=[{I,J}:I in 1..N,J in 1..N,A[I,J]='S'],{R1,C1}=IX[1]
+,println({r1=R1,c1=C1})
+,S0={A,R0,C0,0,1}
+,cost(S0,Cost)
+,!
+,S0:={A,R1,C1,0,1}
+,rost(S0,Ca)
+,!
+,p(a)
+,S0:={A,R1,C1,0,-1}
+,rost(S0,Cb)
+,!
+,p(b)
+,S0:={A,R1,C1,-1,0}
+,rost(S0,Cc)
+,!
+,p(c)
+,S0:={A,R1,C1,1,0}
+,rost(S0,Cd)
+,!
+,p({d,Ca,Cb,Cc,Cd})
+,B={{0:J in 1..N}:I in 1..N}
+,foreach (I in 1..N,J in 1..N,{Dr,Dc}in [{-1,0},{1,0},{0,-1},{0,1}])
+    %println({i=I,j=J,a=A}),
+    if(A[I,J]!='#') then
+        %p(x={I,J,Dc,Dr}),
+        C1:=fc({A,I,J,Dc,Dr}),
+        %p(y),
+        C2:=fr({A,I,J,-Dc,-Dr}),
+        if C1+C2=Cost then 
+            B[I,J]:=1
+            %println({c1=C1,c2=C2})
+        end
+    end
+end
+%,pc(B)
+,println(B.to_list.map(sum).sum)
+.

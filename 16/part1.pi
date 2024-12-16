@@ -1,0 +1,23 @@
+import aoc.
+import planner.
+
+final({A,R,C,Dr,Dc})=>A[R,C]='E'.
+
+action({A,R,C,Dr,Dc},S,M,P)=>(
+    between(1,A.length,R+Dr),between(1,A.length,C+Dc),A[R+Dr,C+Dc]!='#',S={A,R+Dr,C+Dc,Dr,Dc},M=c,P=1;
+    S={A,R,C,Dc,-Dr},M=l,P=1000;
+    S={A,R,C,-Dc,Dr},M=r,P=1000
+    ).
+
+main([F|T])=>
+A=rcm(F)
+,pc(A)
+%,println({A.length,A[1].length})
+,N=A.length
+,IX=[{I,J}:I in 1..N,J in 1..N,A[I,J]='S'],{R0,C0}=IX[1]
+%,println({R0,C0})
+,S0={A,R0,C0,0,1}
+,best_plan(S0,Plan,Cost)
+,println(Plan)
+,println(Cost)
+.
