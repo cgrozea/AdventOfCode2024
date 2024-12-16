@@ -1,0 +1,52 @@
+import aoc.
+
+d([])=[]=>true.
+d(['#'|T])=(['#','#'|T2])=>d(T)=T2.
+d(['.'|T])=(['.','.'|T2])=>d(T)=T2.
+d(['O'|T])=(['[',']'|T2])=>d(T)=T2.
+d(['@'|T])=(['@','.'|T2])=>d(T)=T2.
+
+
+main([F|T])=>A=rcm(F)
+,AX=[I:I in 1..A.length,A[I].length=0],AX:=AX[1]
+,M:=[A[I].to_list:I in AX+1..A.length,A[I]!='\n']
+,A:={A[I]:I in 1..AX-1}
+,append2(M,M2),M:=M2
+,pc(A),println(M.length)
+%,println(M)
+%,println({A.length,A[1].length})
+,A:={d(A[I].to_list).to_array:I in 1..A.length}
+,pc(A)
+,N=A.length,N2=N*2
+,W=[{I,J}:I in 1..N,J in 1..N2,A[I,J]='@'],W:=W[1],println(W)
+,foreach(P in M)
+println(P)
+,m(A,P,N,W,W2),W:=W2
+%,pc(A)
+%,if P='<' then exit end
+end
+,println([100*I+J-101:I in 1..N,J in 1..N2,A[I,J]='['].sum)    
+.
+
+
+pos(A,N,R,C,D),A[R,C]='.'=>true.
+pos(A,N,R,C,D),A[R,C]='['=>pos(A,N,R+D,C,D),pos(A,N,R+D,C+1,D).
+pos(A,N,R,C,D),A[R,C]=']'=>pos(A,N,R+D,C,D),pos(A,N,R+D,C-1,D).
+
+doit(A,N,R,C,D,X),A[R,C]='.'=>A[R,C]:=X.
+doit(A,N,R,C,D,X),A[R,C]='['=>doit(A,N,R+D,C,D,'['),doit(A,N,R+D,C+1,D,']'),A[R,C]:=X,A[R,C+1]:='.'.
+doit(A,N,R,C,D,X),A[R,C]=']'=>doit(A,N,R+D,C,D,']'),doit(A,N,R+D,C-1,D,'['),A[R,C]:=X,A[R,C-1]:='.'.
+
+
+m(A,<,N,{R,C},P2),A[R,C]!='@'=>println(wrong={R,C}),false.
+
+m(A,^,N,{R,C},P2),P2={R-1,C}?=>pos(A,N,R-1,C,-1),doit(A,N,R-1,C,-1,'@'),A[R,C]:='.'.
+m(A,v,N,{R,C},P2),P2={R+1,C}?=>pos(A,N,R+1,C,1),doit(A,N,R+1,C,1,'@'),A[R,C]:='.'.
+
+m(A,<,N,{R,C},P2),P2={R,C-1}?=>I0:=C-1,while (member(A[R,I0],"[]")) I0:=I0-1 end,A[R,I0]='.',!,bo(A,R,I0,C-2),A[R,C-1]:='@',A[R,C]:='.'.
+m(A,>,N,{R,C},P2),P2={R,C+1}?=>I0:=C+1,while (member(A[R,I0],"[]")) I0:=I0+1 end,A[R,I0]='.',!,bo(A,R,C+2,I0),A[R,C+1]:='@',A[R,C]:='.'.
+m(A,M,N,P,Q),Q=P=>true.
+
+%bo(A,R,C1,C2)?=>println({c1=C1,c2=C2}),false.
+bo(A,R,C1,C2),C1<C2=>A[R,C1]:='[',A[R,C1+1]:=']',bo(A,R,C1+2,C2).
+bo(A,R,C1,C2)=>true.

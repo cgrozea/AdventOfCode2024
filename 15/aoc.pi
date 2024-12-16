@@ -1,0 +1,28 @@
+module aoc.
+
+import util.
+import regex.
+
+append2([],[]).
+append2([H|T],R):-append(H,AT,R),append2(T,AT).
+
+rnm(F)=M=>M={A.map(to_int).to_array:A in read_file_lines(F).map(split)}.
+rcm(F)=M=>M=read_file_lines(F).map(to_array).to_array.
+rim(F)=M=>M={A.keepdigits.split.map(to_int).to_array:A in read_file_lines(F)}.
+
+keepdigits([])=[]=>true.
+keepdigits([H|T])=[H|keepdigits(T)],(digit(H);H= -)=>true.
+keepdigits([H|T])=[' '|keepdigits(T)]=>true.
+
+
+p(A)=>println(A).
+pp(A)=>foreach(X in A) p(X) end,println(-----------------------------------).
+q(A)=>foreach(X in A) print(X) end,nl.
+pc(A)=>foreach(X in A) q(X) end,println(-----------------------------------).
+
+
+
+%main=>append2([X,"=x y=",Y],"3=x y=4"), println({X,Y}).
+grnm(F)=>A=rnm(F), pp(A).
+grcm(F)=>A=rcm(F), pp(A).
+grim(F)=>A=rim(F), pp(A).

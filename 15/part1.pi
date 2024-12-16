@@ -1,0 +1,26 @@
+import aoc.
+main([F|T])=>A=rcm(F)
+,AX=[I:I in 1..A.length,A[I].length=0],AX:=AX[1]
+,M:=[A[I].to_list:I in AX+1..A.length,A[I]!='\n']
+,A:={A[I]:I in 1..AX-1}
+,append2(M,M2),M:=M2
+%,pp(A),println(M.length)
+%,println(M)
+%,println({A.length,A[1].length})
+,N=A.length
+,W=[{I,J}:I in 1..N,J in 1..N,A[I,J]='@'],W:=W[1]
+,println(W)
+,foreach(P in M)
+println(P)
+,m(A,P,N,W,W2),W:=W2
+,println(W)
+%pc(A)
+end
+,println([100*I+J-101:I in 1..N,J in 1..N,A[I,J]='O'].sum)
+.
+m(A,>,N,{R,C},P2),P2={R,C+1}?=>I0:=C+1,println({R,I0,A[R,I0]}),while (A[R,I0]=='O') I0:=I0+1,println(I0) end,println({R,I0,A[R,I0]}),A[R,I0]='.',!,A[R,I0]:='O',A[R,C+1]:='@',A[R,C]:='.'.
+m(A,<,N,{R,C},P2),A[R,C]!='@'=>println(wrong={R,C}),false.
+m(A,<,N,{R,C},P2),P2={R,C-1}?=>I0:=C-1,while (A[R,I0]='O') I0:=I0-1 end,A[R,I0]='.',!,A[R,I0]:='O',A[R,C-1]:='@',A[R,C]:='.'.
+m(A,^,N,{R,C},P2),P2={R-1,C}?=>I0:=R-1,while (A[I0,C]='O') I0:=I0-1 end,A[I0,C]='.',!,A[I0,C]:='O',A[R-1,C]:='@',A[R,C]:='.'.
+m(A,v,N,{R,C},P2),P2={R+1,C}?=>I0:=R+1,while (A[I0,C]='O') I0:=I0+1 end,A[I0,C]='.',!,A[I0,C]:='O',A[R+1,C]:='@',A[R,C]:='.'.
+m(A,M,N,P,Q),Q=P=>true.
