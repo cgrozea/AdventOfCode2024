@@ -1,0 +1,38 @@
+import aoc.
+main([F|T])=>
+A=rim(F)
+,pp(A)
+%,println({A.length,A[1].length})
+%,N=A.length
+,R=e(1,A[5],A[1,1],A[2,1],A[3,1])
+,append2(R,R2)
+,p(R2)
+.
+
+e(IP,P,A,B,C)=R,IP>P.length=>R=[],p(final={a=A,b=B,c=C}).
+e(IP,P,A,B,C)=R=>
+    i(IP,P[IP],P[IP+1],A,B,C)={H,IP2,A2,B2,C2,Op},
+    p({op=Op,ip=IP,i=P[IP],o=P[IP+1],a=A,b=B,c=C,result,prt=H,ip=IP2,a=A2,b=B2,c=C2}),
+    e(IP2,P,A2,B2,C2)=T2,
+    R=[H|T2].
+
+o(I,_,_,_)=R,I<=3=>R=I.
+o(4,A,_,_)=R=>R=A.
+o(5,_,A,_)=R=>R=A.
+o(6,_,_,A)=R=>R=A.
+
+
+i(IP,I,O,A,B,C)=R,I=0=>R={[],IP+2,A>>o(O,A,B,C),B,C,adv}.
+i(IP,I,O,A,B,C)=R,I=1=>R={[],IP+2,A,B^O,C,bxl}.
+i(IP,I,O,A,B,C)=R,I=2=>R={[],IP+2,A,o(O,A,B,C)mod 8,C,bst}.
+i(IP,I,O,A,B,C)=R,I=3=>(A=0,R={[],IP+2,A,B,C,jnz0};R={[],1+o(O,A,B,C),A,B,C,jnz}). %jnz
+i(IP,I,O,A,B,C)=R,I=4=>R={[],IP+2,A,B^C,C,bxc}.
+i(IP,I,O,A,B,C)=R,I=5=>R={[o(O,A,B,C) mod 8],IP+2,A,B,C,out}.
+i(IP,I,O,A,B,C)=R,I=6=>R={[],IP+2,A,A>>o(O,A,B,C),C,bdv}.
+i(IP,I,O,A,B,C)=R,I=7=>R={[],IP+2,A,B,A>>o(O,A,B,C),cdv}.
+
+g1=>p(e(1,{2,6},_,_,9)).
+g2=>p(e(1,{5,0,5,1,5,4},10,_,_)).
+g3=>p(e(1,{0,1,5,4,3,0},2024,_,_)).
+g4=>p(e(1,{1,7},_,29,_)).
+g5=>p(e(1,{4,0},_,2024,43690)).
