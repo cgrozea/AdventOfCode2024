@@ -1,0 +1,42 @@
+import aoc.
+
+final({A,R,C,N,K})=>A[R,C]=2.
+
+%action({A,R,C,N,K},S,M,P)?=>p({R,C,N}),pp(A),fail.
+action({A,R,C,N,K},S,M,P),C>1,A[R,C-1]!=1?=>P=1,S={A,R,C-1,N,K},M=left.
+action({A,R,C,N,K},S,M,P),C<N,A[R,C+1]!=1?=>P=1,S={A,R,C+1,N,K},M=righ.
+action({A,R,C,N,K},S,M,P),R>1,A[R-1,C]!=1?=>P=1,S={A,R-1,C,N,K},M=up.
+action({A,R,C,N,K},S,M,P),R<N,A[R+1,C]!=1=>P=1,S={A,R+1,C,N,K},M=down.
+
+table(+,min)
+%cost(S,Cost),S={A,R,C,N,K}?=>println(cost={R,C,A[R,C],Cost}),fail.
+cost(S,C),final(S)=>C=0.
+cost(S,C)=>action(S,S2,_,P),cost(S2,C1),C=C1+P.
+
+works(L,A,K)=>
+p(k=K)
+,N=A.length
+,foreach({R,C} in [L[I]:I in 1..K])
+    A[R+1,C+1]:=1
+end
+,A[N,N]:=2
+,S0={A,1,1,N,K}
+,cost(S0,Cost).
+
+binsearch(L,A,X,Y)=R,Y<=X+1=>R=Y.
+binsearch(L,A,X,Y)=R,Z=(X+Y)//2=>
+    if works(L,A,Z) then
+        R=binsearch(L,A,Z,Y)
+    else
+        R=binsearch(L,A,X,Z)
+    end.
+
+main([F,D])=>
+L=rim(F).to_list
+%,p(L)
+,N:=D.to_int+1
+,p(N)
+,A=zeros(N)
+,Z=binsearch(L,A,1,L.length)
+,p(L[Z])
+.

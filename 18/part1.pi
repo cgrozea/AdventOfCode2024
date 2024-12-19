@@ -1,0 +1,31 @@
+import aoc.
+
+final({A,R,C,N})=>A[R,C]=2.
+
+%action({A,R,C,N},S,M,P)?=>p({R,C,N}),pp(A),fail.
+action({A,R,C,N},S,M,P),C>1,A[R,C-1]!=1?=>P=1,S={A,R,C-1,N},M=left.
+action({A,R,C,N},S,M,P),C<N,A[R,C+1]!=1?=>P=1,S={A,R,C+1,N},M=righ.
+action({A,R,C,N},S,M,P),R>1,A[R-1,C]!=1?=>P=1,S={A,R-1,C,N},M=up.
+action({A,R,C,N},S,M,P),R<N,A[R+1,C]!=1=>P=1,S={A,R+1,C,N},M=down.
+
+table(+,min)
+%cost(S,Cost),S={A,R,C,N}?=>println({R,C,A[R,C],Cost}),fail.
+cost(S,C),final(S)=>C=0.
+cost(S,C)=>action(S,S2,_,P),cost(S2,C1),C=C1+P.
+
+main([F,D,K])=>
+L=rim(F).to_list
+,p(L)
+,N:=D.to_int+1
+,p(N)
+,A=zeros(N)
+,pp(A)
+,K:=K.to_int
+,foreach({R,C} in [L[I]:I in 1..K])
+    A[R+1,C+1]:=1
+end
+,A[N,N]:=2
+,pp(A)
+,S0={A,1,1,N}
+,cost(S0,Cost),p(Cost)
+.
