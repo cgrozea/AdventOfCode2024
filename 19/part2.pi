@@ -1,0 +1,17 @@
+import aoc.
+import util.
+
+main([F|T])=>
+A=read_file_lines(F)
+,P=A[1].split(", ")
+,L=[A[I]:I in 3..A.length]
+,p(patterns=P.length)
+,p([R:X in L,e(P,X,R)].sum)
+.
+
+table(+,+,-)
+e(P,A,R),A=[]=>R=1.
+e(P,A,R)=>R=findall(R2,(append(A1,A2,A),member(A1,P),e(P,A2,R2))).sum.
+
+
+
