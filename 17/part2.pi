@@ -1,0 +1,57 @@
+import cp.
+%import sat.
+%import mip.
+%import smt.
+
+import aoc.
+         
+%C = A >> B         
+shift_constr(A,B,C)=>B#=0 #/\ C#=A 
+            #\/ B#=1 #/\ C#=A//2
+            #\/ B#=2 #/\ C#=A//4
+            #\/ B#=3 #/\ C#=A//8
+            #\/ B#=4 #/\ C#=A//16
+            #\/ B#=5 #/\ C#=A//32
+            #\/ B#=6 #/\ C#=A//64
+            #\/ B#=7 #/\ C#=A//128.          
+mod8(A,B)=>shift_constr(A,3,B1),B#=A-8*B1.   
+bits(A,V,N)=>V=new_array(N),V::0..1,A#=sum([2**(I-1)*V[I]:I in 1..N]).
+xor_constr(A,B,C,N)=>bits(A,VA,N),bits(B,VB,N),bits(C,VC,N)
+,foreach(I in 1..N) VC[I] #= VA[I] #^ VB[I] end
+.
+            
+%Program: 2,4, 1,1, 7,5, 4,0, 0,3, 1,6, 5,5, 3,0
+eq(A,Seen,After,N,Dbg)=>
+            Dbg={a=A,b1=B1,b2=B2,bx1=Bx1,b=B,c=C,bc=BC,newb=NewB,after=After},
+            MX=2**N-1,
+            B1::0..3,B2::0..1,B#=2*B1+B2, % B2=last bit in B
+            Bx1::0..7,Bx1#=2*B1+1-B2, % BX1=B xor 1
+            A::0..MX,
+            mod8(A,Bx1),% B xor 1 = A mod 8 <=> B = (A mod 8) xor 1
+            C::0..MX,
+            shift_constr(A,B,C), % C = A >> B
+            BC::0..MX,
+            xor_constr(B,C,BC,N), % BC = B xor C
+            C6::0..MX,
+            C6#=6,
+            NewB::0..MX,
+            xor_constr(BC,C6,NewB,N), % NewB = (B xor C) xor 6
+            mod8(NewB,Seen),
+            After::0..2**(N-3)-1,
+            shift_constr(A,3,After).
+sol(A,A0,[],N,R)=>A=A0,R=[].
+sol(A,After,[H|T],N,R)=>eq(A1,H,After,N-3,Dbg),solve([A1]),R=[Dbg|TD],sol(A,A1,T,N,TD).
+
+
+main=> Seen=[  
+2,4, 
+1,1, 
+7,5, 
+4,0, 
+0,3, 
+1,6, 
+5,5, 
+3,0
+].reverse,
+N=59,
+sol(A,0,Seen,N,Dbg),p(A).
