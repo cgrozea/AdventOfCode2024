@@ -1,0 +1,56 @@
+import aoc.
+
+final(A,{R,C},E)=>A[R,C]=E.
+
+nn(R,C,N,R2,C2)=>(R>1,R2=R-1,C2=C;C>1,R2=R,C2=C-1;R<N,R2=R+1,C2=C;C<N,R2=R,C2=C+1).
+
+%action(A,N,{R,C},S,M,P)?=>p({R,C,N}),fail.
+action(A,N,{R,C},S,M,P)?=>nn(R,C,N,R2,C2),A[R2,C2]!='#',P=1,S={R2,C2},M=m.
+
+%Djikstra like in https://github.com/DestyNova/advent_of_code_2024/blob/main/18/part1.pi
+
+a(A,N,S,E,Cost,RDist)=>
+Q=new_min_heap(3),
+Q.heap_push({Cost,S}),
+Seen=new_set(),
+%p(S),
+Dists=add(zeros(N),20000),
+Dists[S[1],S[2]]:=Cost,
+while(Q.heap_size()>0)
+    {C1,S1}=Q.heap_pop(),
+    %p(extracted={C1,S1}),
+    %if (A[S1[1],S1[2]]!='.') then p({S1,C1,A[S1[1],S1[2]]}) end,
+    if not (Seen.has_key(S1)) then
+        Seen.put(S1),
+        Dists[S1[1],S1[2]]:=C1,
+        L=findall({C2,S2},(action(A,N,S1,S2,_,P),C2=C1+P)),
+        %p(l=L),
+        foreach({C2,S2} in L)
+            %p(push={C2,S2}),
+            Q.heap_push({C2,S2})
+        end,
+    end
+end,
+RDist=Dists
+.
+
+main([F])=>
+A=rcm(F)
+%,pc(A)
+,N=A.length
+%,p({N,A[1].length})
+,IX=[{I,J}:I in 1..N,J in 1..N,A[I,J]='S'],{R,C}=IX[1]
+,S0={R,C}
+,a(A,N,S0,'E',0,Dist1)
+,IX1=[{I,J}:I in 1..N,J in 1..N,A[I,J]='E'],{R1,C1}=IX1[1]
+,S1={R1,C1}
+,a(A,N,S1,'S',0,Dist2)
+,D12=add(Dist1,Dist2)
+,Opt=D12.to_list.map(min).min
+,p(Opt)
+,D=2
+,p([1:X1 in 1..N,Y1 in 1..N,X2 in X1-D..X1+D,Y2 in Y1-D..Y1+D,between(1,N,X2),between(1,N,Y2)
+    ,Ma=abs(X1-X2)+abs(Y1-Y2),Ma>=1,Ma<=D
+    ,Dist1[Y1,X1]+Dist2[Y2,X2]+Ma<=Opt-100
+    ].length)
+.
