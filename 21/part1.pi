@@ -1,0 +1,70 @@
+import aoc.
+
+final(S)=>S[1]=[].
+
+nn(A,R,C,R2,C2,M,Out)?=>(R2=R-1,C2=C,M='^';R2=R,C2=C-1,M='<';R2=R+1,C2=C,M='v';R2=R,C2=C+1,M='>';R2=R,C2=C,Mov=' '),A[R2,C2]!='#',Out=' '. %move
+nn(A,R,C,R2,C2,M,Out)?=>M='A',Out=A[R,C],R2=R,C2=C. %press
+
+action(M1,M2,[[Hout|Tout],{Rn,Cn}|T1],S2,M,P)=>
+Mov:=X,
+L:=[],
+foreach({R,C} in T1)
+    %p(Mov),
+    nn(M2,R,C,R2,C2,Mov,Out),
+    Mov:=Out,
+    L:=L++[{R2,C2}]
+end,
+nn(M1,Rn,Cn,Rn2,Cn2,Mov,Out2),
+if Out2!=' ' then
+    Out2=Hout,Tout2=Tout
+    else
+    Tout2=[Hout|Tout]
+end,
+S2=[Tout2,{Rn2,Cn2}|L],
+P=1.
+
+%Djikstra like in https://github.com/DestyNova/advent_of_code_2024/blob/main/18/part1.pi
+a(M1,M2,S,Cost,Rcost)=>
+Q=new_min_heap(1000),
+Q.heap_push({Cost,S}),
+Seen=new_set(),
+%p(S),
+Final:=0,
+while(Q.heap_size()>0,Final=0)
+    {C1,S1}=Q.heap_pop(),
+    if(final(S1)) then
+        Final:=1,
+        Rcost=C1
+    else
+        %p(extracted={C1,S1}),
+        %if (A[S1[1],S1[2]]!='.') then p({S1,C1,A[S1[1],S1[2]]}) end,
+        if not (Seen.has_key(S1)) then
+            Seen.put(S1),
+            L=findall({C2,S2},(action(M1,M2,S1,S2,_,P),C2=C1+P)),
+            %p(l=L),
+            foreach({C2,S2} in L)
+                %p(push={C2,S2}),
+                Q.heap_push({C2,S2})
+            end
+        end
+    end
+end
+.
+
+main([F])=>
+%A=rim(F)
+%A=rnm(F)
+A=rcm(F)
+,N=A.length
+,p({N,A[1].length})
+,pc(A)
+,M1=rcm("m1")
+,M2=rcm("m2")
+,pc(M1)
+,pc(M2)
+,S0=[{5,4},{2,4},{2,4}]
+%,S0=[{5,4},{2,4}]
+%,a(M1,M2,["029A"|S0],0,Opt),p(Opt)
+%,p([{opt=Opt,num=[Y:Y in X,Y!='A'].to_int}:X0 in A,X=X0.to_list,p(X),a(M1,M2,[X|S0],0,Opt),p(Opt)])
+,p([Opt*[Y:Y in X,Y!='A'].to_int:X0 in A,X=X0.to_list,p(X),a(M1,M2,[X|S0],0,Opt),p(Opt)].sum)
+.
