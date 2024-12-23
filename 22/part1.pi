@@ -1,0 +1,21 @@
+import aoc.
+steps(A,0,R)=>R=A.
+steps(A,N,R)=>step(A,A2),steps(A2,N-1,R).
+d(A)=R=>R=A mod 10.
+mix(A,B)=C=>C=A ^ B.
+prune(A)=B=>B=A mod 16777216.
+s1(A,B)=>B=mix(A,A*64).prune.
+s2(A,B)=>B=mix(A,A//32).prune.
+s3(A,B)=>B=mix(A,A*2048).prune.
+step(A,B)=>s1(A,A2),s2(A2,A3),s3(A3,B).
+
+main([F,N0])=>
+A=rim(F)
+,p({A.length})
+,N=N0.to_int
+,L=[X[1]:X in A]
+,p(L)
+,p({mix(42,15),100000000.prune})
+%,p([R:I in 1..10,steps(123,I,R)])
+,p([R:X in L,steps(X,N,R)].sum)
+.
