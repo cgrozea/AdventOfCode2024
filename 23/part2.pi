@@ -1,0 +1,55 @@
+import aoc.
+import util.
+import cp.
+
+addn(N,A,B)=>
+if not N.has_key(A) then
+    N.put(A,new_set())
+end,
+N.get(A).put(B).
+
+myscc(Vs,Es)=>
+S=new_set([{X,Y}:{X,Y,Z} in Es,Z=1]),
+foreach({X,A} in Vs, {Y,B} in Vs,X!=Y)
+    if (not(S.has_key({X,Y})),not(S.has_key({X,Y}))) then
+        #~A #\/ #~B,
+        p(notboth={X,Y})
+    end
+end.
+
+
+main([F|T])=>
+A=[L.split("-"):L in read_file_lines(F)]
+%,p(A)
+,S=new_set([X[1]:X in A])
+,foreach(Y in [X[2]:X in A])
+S.put(Y)
+end
+,p(S.keys.length),
+N=new_map(),
+foreach(X in A),
+    addn(N,X[1],X[2]),
+    addn(N,X[2],X[1])
+end
+,Vars=new_array(S.keys.length)
+,Vars::0..1
+,All=S.keys
+,Vs=[{All[I],Vars[I]}:I in 1..All.length]
+%,Es=[{X,Y,V12[1]}:X in N.keys,Y in N.get(X).keys,{X,V1} in Vs,{Y,V2} in Vs, V12=new_array(1),V12::0..1,V12[1]#=V1#/\V2]
+%,Es=[{"co","de",1},{"de","ab",1},{"co","ab",0}]
+,Es=[{X,Y,1}:X in N.keys,Y in N.get(X).keys]
+%,p(Es.length)
+,p(Vs)
+%,scc(Vs,Es)
+,myscc(Vs,Es)
+,Card::0..Vs.length
+,Card#=sum([V:{X,V}in Vs])
+,p(solve)
+,solve([$max(Card)],[V:{X,V} in Vs])
+%,p(Es)
+%,p(Vs)
+,p(Card)
+,Res=[X:{X,1} in Vs]
+,p(Res.sort.join(","))
+.
+

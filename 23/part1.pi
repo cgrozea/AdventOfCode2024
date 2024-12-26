@@ -1,0 +1,54 @@
+import aoc.
+import util.
+
+addn(N,A,B)=>
+if not N.has_key(A) then
+    N.put(A,new_set())
+end,
+N.get(A).put(B).
+
+
+
+
+main([F|T])=>
+A=[L.split("-"):L in read_file_lines(F)]
+,S=new_set([X[1]:X in A])
+%,p([X[2]:X in A])
+,foreach(Y in [X[2]:X in A])
+S.put(Y)
+end
+,p(S.keys.length),
+N=new_map(),
+foreach(X in A),
+    addn(N,X[1],X[2]),
+    addn(N,X[2],X[1])
+end
+%,p(N.keys)
+%,p([cc(N,NN,X):X in S.keys,X[1]='t',NN=N.get(X)].sum)
+%,neigh(N,"co","de")
+%,NN=N.get("co")
+%,p(NN)
+%,p(cc(N,NN,"co"))
+,T:=0
+,foreach (X in S.keys)
+    if X[1]='t' then
+    p(X),
+    NN=N.get(X),
+    %p(NN),
+    %p({X,NN}),
+    CC:=cc(N,NN,X),
+    p(CC),
+    T:=T+CC
+    end    
+end
+,p(T)
+.
+
+v([A,B])=C=>C=256*ord(A)+ord(B).
+
+cc(N,L,X)=C=>%p(cc={L,X}),
+AX=[[A,B]:A in L.keys,B in L.keys,v(A)<v(B),(A[1]!='t';v(X)<v(A)),(B[1]!='t';v(X)<v(B)),neigh(N,A,B)],
+C=AX.length.
+
+neigh(N,A,B)=>%p(neigh={A,B}),
+N.get(A).has_key(B).
