@@ -1,0 +1,135 @@
+import aoc.
+import util.
+import sat.
+op("OR",X,Y,R)=>R#=(X#\/Y).
+op("AND",X,Y,R)=>R#=(X#/\Y).
+op("XOR",X,Y,R)=>R#=(X#^Y).
+e(Vx,Vy,M,Swappers,X,R)=>
+L=M.get(X,[notfound]),
+if L=[R2] then
+    if X[1]='x' then
+        R=Vx[tail(X).to_int+1]
+    else
+            if X[1]='y' then
+                R=Vy[tail(X).to_int+1]
+            else
+                R=R2,exit(0)
+            end                
+    end
+else
+   L=[_,Vafter|_],R=Vafter
+end.
+add_gate_constr(M,Swappers,Vx,Vy,L)=>
+L=[V,Vafter,Vswap,Op,T1,T2,Name],
+e(Vx,Vy,M,Swappers,T1,V1),
+e(Vx,Vy,M,Swappers,T2,V2),
+op(Op,V1,V2,V),
+(sum(Vswap)#=0)#/\(Vafter#=V)
+#\/ (sum(Vswap)#>0) #/\ 
+(
+Vswap[1] #/\ V#=Swappers[1]
+#\/ Vswap[2] #/\ V#=Swappers[2]
+#\/ Vswap[3] #/\ V#=Swappers[3]
+#\/ Vswap[4] #/\ V#=Swappers[4]
+#\/ Vswap[5] #/\ V#=Swappers[5]
+#\/ Vswap[6] #/\ V#=Swappers[6]
+#\/ Vswap[7] #/\ V#=Swappers[7]
+#\/ Vswap[8] #/\ V#=Swappers[8]
+)
+#/\
+(
+Vswap[1]#/\ Vafter#=Swappers[2]
+#\/ Vswap[2] #/\ Vafter#=Swappers[1]
+#\/ Vswap[3] #/\ Vafter#=Swappers[4]
+#\/ Vswap[4] #/\ Vafter#=Swappers[3]
+#\/ Vswap[5] #/\ Vafter#=Swappers[6]
+#\/ Vswap[6] #/\ Vafter#=Swappers[5]
+#\/ Vswap[7] #/\ Vafter#=Swappers[8]
+#\/ Vswap[8] #/\ Vafter#=Swappers[7]
+)
+.
+mand(C,X,Y,Z)=>
+foreach(I in 1..X.length)
+    Z[I] #= (X[I] #/\ Y[I])
+end
+.
+madd(C,X,Y,Z)=>
+foreach(I in 1..X.length)
+    Z[I] #= (X[I] #^ Y[I] #^ C),
+    D:=new_array(1),D::0..1,D:=D[1],
+    D#=((X[I] + Y[I] + C) #>= 2),
+    C:=D
+end,
+Z[Z.length]#=C.
+v(X)=R=>R=[X[I]*2**(I-1):I in 1..X.length].sum.
+check(X,Y,Z)=>v(X)+v(Y)=v(Z).
+main([F,K0,Steps])=>
+A=[X.split(": "): X in read_file_lines(F)]
+,M=new_map()
+,W=new_set()
+,foreach(L in A,L.length=2)
+    M.put(L[1],[L[2].to_int]),
+    W.put(L[1])
+end
+,VarSwaps=new_map(45)
+,foreach(L in A,L.length=5)
+    if M.has_key(L[5]) then
+        p("duplicate"),
+        exit(0)
+    end,
+    V=new_array(1),V::0..1,V:=V[1],
+    Vafter=new_array(1),Vafter::0..1,Vafter:=Vafter[1],
+    Vswap=new_array(8),Vswap::0..1,
+    VarSwaps.put(L[5],Vswap),
+    M.put(L[5],[V,Vafter,Vswap,L[2],L[1],L[3],L[5]]),
+    W.put(L[5]),
+    W.put(L[1]),
+    W.put(L[3])
+end
+,K=K0.to_int
+,SK=M.keys.sort
+,SKN=SK.length
+,Vars=[V:I in 1..SKN,M.get(SK[I])=[V,_|_]]
+,Vaft=[V:I in 1..SKN,M.get(SK[I])=[_,V,_|_]]
+,Vpos=[V:I in 1..SKN,M.get(SK[I])=[_,_,V|_]]
+,SG=[V:I in 1..SKN,M.get(SK[I])=[_,_,_,_,_,_,V]]
+,SGN=SG.length
+,foreach(X in Vpos)
+    sum(X)#<=1
+end
+,foreach(I in 1..K)
+    sum([X[I]:X in Vpos])#=1
+end
+,sum([sum(X):X in Vpos])#=K
+,Xs=[X:X in W.keys,X[1]='x'].sort
+,Ys=[X:X in W.keys,X[1]='y'].sort
+,Zs=[X:X in W.keys,X[1]='z'].sort
+,p(lengths=[Xs,Ys,Zs].map(length))
+,Ax:=random(42)
+,foreach(Rep in 1..Steps.to_int)
+    p(Rep)    
+    ,Swappers=new_array(8),Swappers::0..1
+    ,Vx:=[random(0,1):_ in Xs]
+    ,Vy:=[random(0,1):_ in Ys]    
+    ,p({Vx,Vy})
+    ,M:=new_map()
+    ,foreach(L in A,L.length=2)
+        M.put(L[1],[L[2].to_int])
+    end
+    ,foreach(L in A,L.length=5)
+        V:=new_array(1),V::0..1,V:=V[1],
+        Vafter:=new_array(1),Vafter::0..1,Vafter:=Vafter[1],
+        Vswap:=VarSwaps.get(L[5]),
+        M.put(L[5],[V,Vafter,Vswap,L[2],L[1],L[3],L[5]]),
+    end    
+    ,foreach(L in A,L.length=5)
+        add_gate_constr(M,Swappers,Vx,Vy,M.get(L[5]))
+    end    
+    ,Vz:=[R:X in Zs,e(Vx,Vy,M,Swappers,X,R)]
+    ,madd(0,Vx,Vy,Vz) % "add" test
+end
+,p(solve)
+,solve(Vars++Vaft++Vpos)
+,Swappednames=[N:[_,_,V,_,_,_,N] in M.values,V.sum>0].sort
+,p(Swappednames)
+.
