@@ -1,0 +1,71 @@
+%picat g.pi 2 8|grep grep|cut -c 6- >2_8
+import aoc.
+import util.
+
+v(C,N)=R=>R=C++n(N).
+n(R)=A=>R<10,A="0"++to_string(R);R>=10,A=to_string(R).
+tmp=N=>N=get_global_map(g).get(n,0),get_global_map(g).put(n,N+1).
+tmpvar(C)=R=>R=v(C,tmp()).
+tmpvar=R=>R=tmpvar("t").
+mxor(A,B,C)=>o([C,"XOR",A,B]).
+mand(A,B,C)=>o([C,"AND",A,B]).
+myor(A,B,C)=>o([C,"OR",A,B]).
+o(X)=>
+L=[X|get_global_map(g).get(o,[])],
+get_global_map(g).put(o,L).
+
+main([N0,K0])=>
+N=N0.to_int,
+K=K0.to_int,
+C:=0,
+foreach (I in 0..N-1)
+    if I==0 then
+        Z:=v("z",I),
+        mxor(v("x",I),v("y",I),Z),
+        if I+1<N then 
+            C:=tmpvar()
+        else
+            C:=v("z",N)
+        end,
+        mand(v("x",I),v("y",I),C)
+    else
+        Z:=tmpvar("t"),
+        mxor(v("x",I),v("y",I),Z),
+        mxor(Z,C,v("z",I)),
+        A12:=tmpvar(),A23:=tmpvar(), A31:=tmpvar(),B:=tmpvar(),
+        mand(v("x",I),v("y",I),A12),
+        mand(C,v("y",I),A23),
+        mand(C,v("x",I),A31),
+        myor(A12,A23,B),
+        if I+1<N then 
+            C:=tmpvar()
+        else
+            C:=v("z",N)
+        end,
+        myor(B,A31,C)
+    end
+end,
+L:=get_global_map(g).get(o)
+,p(L)
+,Q:=L.length
+,Sel:=[]
+,foreach(I in 1..K)
+P:=0
+,do 
+P:=random(1,Q)
+%,p({P,Sel})
+while(member(P,Sel))
+,Sel:=[P|Sel]
+end
+,foreach(I in 1..K,odd(I))
+AX:=L[Sel[I],1],
+L[Sel[I],1]:=L[Sel[I+1],1],
+L[Sel[I+1],1]:=AX
+end
+,p([L[Sel[I],1]:I in 1..K])
+,p(L)
+,foreach([X,Op,A,B] in L)
+,p("grep "++A++" "++Op++" "++B++" -> "++X)
+end
+,p([L[Sel[I],1]:I in 1..K].sort)
+.

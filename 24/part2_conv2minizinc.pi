@@ -1,0 +1,122 @@
+%produces a minizinc model
+%picat t1c.pi i 8 40|grep grep|cut -c6- >a.mzn
+import aoc.
+import util.
+import sat.
+
+op("OR",X,Y,R)=>p("grep constraint "++R++" = ("++X++" \\/ "++Y++");").
+op("AND",X,Y,R)=>p("grep constraint "++R++" = ("++X++" /\\ "++Y++");").
+op("XOR",X,Y,R)=>p("grep constraint "++R++" = ("++X++" xor "++Y++");").
+
+mand(C,X,Y,Z)=>
+foreach(I in 1..X.length)
+    %p(t={X[I],Y[I],Z[I]}),
+    Z[I] #= (X[I] #/\ Y[I])
+end
+.
+
+madd(C,X,Y,Z,Step)=>
+p({X,Y,Z}),
+p([X,Y,Z].map(length)),
+foreach(I in 1..X.length)
+    %p(t={X[I],Y[I],Z[I]}),
+    printf("grep constraint %s = (%s + %s + %s) mod 2;\n",Z[I],X[I],Y[I],C),
+    D=vn("C",Step.to_string,I),
+    printf("grep var 0..1:%s;\n",D),
+    printf("grep constraint %s=if ( %s + %s + %s) >= 2 then 1 else 0 endif;\n",D,X[I],Y[I],C),
+    C:=D
+end,
+printf("grep constraint %s=%s;\n",Z[Z.length],C).
+
+v(X)=R=>R=[X[I]*2**(I-1):I in 1..X.length].sum.
+check(X,Y,Z)=>v(X)+v(Y)=v(Z).
+
+vn(A,B,C)=D=>
+D=A++"_"++B++"_"++C.to_string.
+
+r(Vx,Vy,ReferAs,X)=R=>
+if X[1]='x' then
+    R=Vx[tail(X).to_int+1]
+else
+        if X[1]='y' then
+            R=Vy[tail(X).to_int+1]
+        else
+            R=ReferAs.get(X)
+        end                
+end.
+
+main([F,K0,Steps])=>
+A=[X.split(": "): X in read_file_lines(F)]
+,K=K0.to_int
+%,pp(A)
+,M=new_map()
+,W=new_set()
+,ReferAs=new_map(45)
+,VarSwaps=new_map(45)
+,foreach(Step in 1..Steps.to_int)
+,foreach(L in A,L.length=5)
+    V=vn(L[5],"",Step),
+    Vafter:=vn(L[5],"after",Step),
+    Vswap:=[],% vn(L[5],"swap"++J.to_string,Step):J in 1..8],
+    VarSwaps.put(L[5],Vswap),
+    M.put(L[5],[V,Vafter,Vswap,L[2],L[1],L[3],L[5]]),
+    W.put(L[5]),
+    W.put(L[1]),
+    W.put(L[3]),
+    ReferAs.put(L[5],Vafter),
+    p("grep var bool:"++V++";"),
+    p("grep var bool:"++Vafter++";")
+end
+,foreach(L in A,L.length=2)
+    M.put(L[1],[L[2].to_int]),
+    W.put(L[1]),
+    ReferAs.put(L[1],L[2])
+end
+
+,Xs=[X:X in W.keys,X[1]='x'].sort
+,Ys=[X:X in W.keys,X[1]='y'].sort
+,Bools=["false","true"]
+,Vx:=[Bools[1+random(0,1)]:_ in Xs]
+,Vy:=[Bools[1+random(0,1)]:_ in Ys]
+,Vxs:=[cond(X="true","1","0"): X in Vx]
+,Vys:=[cond(X="true","1","0"): X in Vy]
+,foreach(L in M.values.sort,L.length=7)
+    L=[V,Vafter,Vswap,Op,T1,T2,Name]
+    ,op(L[4],r(Vx,Vy,ReferAs,L[5]),r(Vx,Vy,ReferAs,L[6]),V)
+    ,switchbox(L,K,Step)
+end
+,p(madd)
+,madd("0",Vxs,Vys,[vn(X,"after",Step):X in [L[7]:L in M.values,L.length=7,L[7,1]='z'].sort],Step)
+,p(endstep)
+end %Steps
+,Ngates:=M.keys.length
+,printf("grep array[1..%d,1..%d] of var 0..1: vmat;",Ngates,K),nl
+,P:=0
+,foreach(L in M.values.sort,L.length=7)
+P:=P+1
+,Name=L[7]
+,SN=vn(Name,"switch",0)
+,printf("grep array[1..%d] of var 0..1: %s;\n",K,SN),nl
+,printf("grep constraint forall(I in 1..%d) (%s[I]=vmat[%d,I]);\n",K,SN,P)
+end
+,printf("grep array[1..%s,1..%d] of var 0..1: SW;\n",Steps,K)
+,printf("grep constraint forall(J in 1..%d)(sum([vmat[I,J]|I in 1..%d])=1);\n",K,Ngates)
+,printf("grep constraint forall(I in 1..%d)(sum([vmat[I,J]|J in 1..%d])<=1);\n",Ngates,K)
+,p("grep output([join(\"\",[")
+,foreach(L in M.values.sort,L.length=7)
+    L=[V,Vafter,Vswap,Op,T1,T2,Name]
+    ,SN=vn(Name,"switch",0)
+    ,printf("grep if sum([fix(%s)[I]|I in 1..%d])>0 then \"%s,\" else \"\" endif,\n",SN,K,Name)
+end    
+,p("grep \"\"])]);")
+.
+
+switchbox(L,K,Step)=>
+    L=[V,Vafter,Vswap,Op,T1,T2,Name]
+    ,SN=vn(Name,"switch",0)
+    ,p("grep constraint sum(["++SN++"[I]|I in 1.."++K.to_string++"])=0 /\\ "++Vafter++" = "++V)
+    ,foreach(I in 1..K)
+        p("grep \\/ "++SN++"["++I.to_string++"]=1 /\\ "++V++" = SW["++Step.to_string++","++I.to_string++"] /\\ "++Vafter++" = SW["++Step.to_string++","++(((I-1) ^ 1)+1).to_string++"]")
+    end
+    ,p("grep ;")
+.
