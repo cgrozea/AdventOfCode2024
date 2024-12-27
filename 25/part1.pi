@@ -1,0 +1,20 @@
+import aoc.
+
+k(A,I0)=R=>
+R=[5-max([I:I in 0..6,A[I0+I,J]='.']):J in 1..5].
+
+l(A,I0)=R=>
+R=[max([I:I in 0..6,A[I0+I,J]='#']):J in 1..5].
+
+m(K,L)=>[1:I in 1..5,K[I]+L[I]<=5].sum=5.
+
+main([F|T])=>
+A=rcm(F)
+,pc(A)
+,N=A.length
+,K=new_set([k(A,I):I in 1..N,(I-1)mod 8=0,A[I+6].to_list="#####"])
+,L=new_set([l(A,I):I in 1..N,(I-1)mod 8=0,A[I].to_list="#####"])
+,p(K)
+,p(L)
+,p([1:K1 in K.keys, L1 in L.keys,m(K1,L1)].sum)
+.
