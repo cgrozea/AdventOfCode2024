@@ -1,0 +1,110 @@
+import aoc.
+% UDLRA=12345
+
+lr(1,5). lr(3,2). lr(2,4). ud(1,2). ud(5,4). %left-right, up-down
+%C=cost at level N to go from A to B when the position on the preceding dirpad was L and has to be afterwards L2, using as intermediary nodes only 1..K (otherwise only straight grid transitions to immediate neighbours), ending with press if P=1.
+
+err(S)=>println(S),exit.
+
+table(+,+,+,+,+,+,min,-,+)
+%cost(N,K,A,B,L,P,C,How,L2),N=1?=>p(cost={N,K,A,B,L,P,C,How,L2}),if(not var(L2)) then err("nonfree L2") end,fail.
+cost(N,K,A,B,L,P,C,How,L2),N=0=>P=0,C=0,How=[],L2=5;P=1,C=1,How=[],L2=5.
+cost(N,K,A,B,L,P,C,How,L2),A=B=>
+minof((
+P=0,C=0,How=[],L2=L;between(1,5,L21),P=1,cost(N-1,5,L,5,5,1,C,How1,L21),L2=5,How=[]
+),C)
+.
+
+cost(N,K,A,B,L,P,C,How,L2),K=0=>
+minof(
+(between(1,5,L21),
+(lr(A,B),W=4;lr(B,A),W=3;ud(A,B),W=2;ud(B,A),W=1),cost(N-1,5,L,W,5,1,D,How1,L21),
+(
+P=0,C=D,How=[],L2=W
+;
+P=1,L2=5,between(1,5,L22),cost(N-1,5,W,5,L21,1,E,How2,L22),How=[],C=D+E
+))
+,C)
+. %edge
+
+cost(N,K,A,B,L,P,C,How,L2),K>0=>
+minof(
+(cost(N,K-1,A,B,L,P,C,How,L2);A!=K,B!=K,between(1,5,L21),cost(N,K-1,A,K,L,0,CA,How1,L21),cost(N,K-1,K,B,L21,P,CB,How2,L2),C=CA+CB,How=[])
+,C)
+. %Roy-Warshall 
+
+nn(A,R,C,R2,C2,M)=>(R2=R-1,C2=C,M=1;R2=R,C2=C-1,M=3;R2=R,C2=C+1,M=4;R2=R+1,C2=C,M=2),A[R2,C2]!='#'.
+
+%same, this time for the numpad in M; K is no longer a number, but a list of possible intermediary positions
+table(+,+,+,+,+,+,+,min,-,+)
+%numcost(M,N,K,A,B,L,P,C,How,L2)?=>p(numcost=(N,intermed=K.length,from=A,to=B,last=L,press=P)),fail.
+
+numcost(M,N,K,A,B,L,P,C,How,L2),A=B=>
+minof((
+P=0,C=0,How=[],L2=L;P=1,between(1,5,L21),cost(N-1,5,L,5,5,1,C,How,L21),L2=5
+),C).
+
+numcost(M,N,K,A,B,L,P,Cost,How,L2),K=[],A={R,C}=>
+minof((nn(M,R,C,R2,C2,W),B={R2,C2},between(1,5,L21),cost(N-1,5,L,W,5,1,D,How1,L21),
+(P=0,Cost=D,How=[],L2=W;P=1,between(1,5,L22),cost(N-1,5,W,5,L21,1,E,How2,L22),L2=5,How=[],Cost=D+E)),C). %edge
+
+numcost(M,N,K,A,B,L,P,C,How,L2)=>
+minof((K.length>0,numcost(M,N,tail(K),A,B,L,P,C,How,L2);A!=K[1],B!=K[1],between(1,5,L21),numcost(M,N,tail(K),A,K[1],L,0,CA,How1,L21),numcost(M,N,tail(K),K[1],B,L21,P,CB,How2,L2),C=CA+CB,How=[]
+),C). %Roy-Warshall
+
+/*
+,if (A={5,4},B={4,2}) then
+p([alternative,[rw=N=A>K[1]>B,L,P=C=[CA,+,CB]]])
+end
+*/
+
+padpos(M,X)=Res=>L=[{I,J}:I in 2..5,J in 2..4,M[I,J]=X],Res=L[1].
+np(L)=>np(L,0).
+np(L,K)=>Moves="^v<>A",p([Moves[C]:{K,C} in L]).
+npa(L)=>M=[[" ":_ in 1..100]:_ in 1..3],
+P:=0,
+Moves="^v<>A",
+foreach(X in L, X={K,C})
+    P:=P+1,
+    M[1+K,P-K]:=Moves[C]
+end
+,pc(M).
+
+sc(M,N,K,S,L)=P=>
+Z:=0,
+LM:=5,
+foreach (X in L)
+    T:=padpos(M,X),
+    p(numcostcall={n=N,S,T,LM,1,C,How,L2}),
+    numcost(M,N,K,S,T,LM,1,C,How,L2),
+    p({S>T,l2=L2,x=X,c=C}),
+    Z:=Z+C,
+    S:=T,
+    p("sol:"),
+    %p(How),
+    p([Y: Y in How, Y!={_,_}]),
+    %np(How),np(How,1),np(How,2)
+    npa(How)
+end, P=Z.
+
+main([F,N0
+%,Str
+%,Last
+])=>
+M=rcm("m1")
+,K=[{I,J}:I in 2..5,J in 2..4,M[I,J]!='#']
+%,p(K)
+,N=N0.to_int
+%,cost(N,5, 1,3, 5,1,C,How)
+%,numcost(M,N,K,{5,4},{5,3},5,1,C,How)
+%,p(C),np(How)
+%,p(K)
+%,p(sc(M,N,K,{5,4},Str))
+%%,p(sc(M,N,K,{4,3},"6"))
+%%,p(sc(M,N,K,{5,4},"A"))
+%,numcost(M,N,K,{5,4},{4,2},5,0,C,How,X),npa(How),p(C).
+%,cost(1,5,5,2,5,1,C,How,L2),p(L2),p(How)
+,A=rcm(F)
+,pc(A)
+,p([Opt*[Y:Y in X,Y!='A'].to_int:X0 in A,X=X0.to_list,p(X),Opt=sc(M,N,K,{5,4},X),p(Opt)].sum)
+.
