@@ -65,7 +65,6 @@ end
 ,SKN=SK.length
 ,Vpos=[V:I in 1..SKN,M.get(SK[I])=[_,_,V|_]] %all swapp flags
 ,SG=[V:I in 1..SKN,M.get(SK[I])=[_,_,_,_,_,_,V]] %all symbols for gates
-,SGN=SG.length
 ,foreach(X in Vpos)
     sum(X)#<=1 %every gate takes part in atmost one swap slot
 end
