@@ -72,10 +72,6 @@ end
 %stores the associated variable to a gate, the value after the potential swap
 ,VarSwaps=new_map(45) 
 ,foreach(L in A,L.length=5) %processes the definitions of the gates
-    if M.has_key(L[5]) then %if already seen (shouldn't be the case)
-        p("duplicate"),
-        exit(0)
-    end,
     %if this variable is swapped with any of the slots
     Vswap=new_array(8),Vswap::0..1, 
     VarSwaps.put(L[5],Vswap), %associate these flags with the variable
