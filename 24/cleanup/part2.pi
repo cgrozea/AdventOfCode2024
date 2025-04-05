@@ -86,8 +86,6 @@ end
         p("duplicate"),
         exit(0)
     end,
-    V=new_array(1),V::0..1,V:=V[1], %gate output before swap
-    Vafter=new_array(1),Vafter::0..1,Vafter:=Vafter[1], %gate output after swap
     Vswap=new_array(8),Vswap::0..1, %if this variable is swapped with any of the slots
     VarSwaps.put(L[5],Vswap), %associate these flags with the variable
     M.put(L[5],[V,Vafter,Vswap,L[2],L[1],L[3],L[5]]), %store the original gate info and the variables
@@ -98,8 +96,8 @@ end
 ,K=K0.to_int
 ,SK=M.keys.sort
 ,SKN=SK.length
-,Vars=[V:I in 1..SKN,M.get(SK[I])=[V,_|_]] %all vars
-,Vaft=[V:I in 1..SKN,M.get(SK[I])=[_,V,_|_]] %all vars after swapps
+%,Vars=[V:I in 1..SKN,M.get(SK[I])=[V,_|_]] %all vars
+%,Vaft=[V:I in 1..SKN,M.get(SK[I])=[_,V,_|_]] %all vars after swapps
 ,Vpos=[V:I in 1..SKN,M.get(SK[I])=[_,_,V|_]] %all swapp flags
 ,SG=[V:I in 1..SKN,M.get(SK[I])=[_,_,_,_,_,_,V]] %all symbols for gates
 ,SGN=SG.length
@@ -138,7 +136,7 @@ end
     ,madd(0,Vx,Vy,Vz) % enforce Vx+Vy=Vz with suitable swapps
 end
 ,p(solve)
-,solve(Vars++Vaft++Vpos) %solve the constraint problem
+,solve(Vpos) %solve the constraint problem
 ,Swappednames=[N:[_,_,V,_,_,_,N] in M.values,V.sum>0].sort %extract the names of the gates swapped
 ,p(Swappednames) %and display them after sort
 .
