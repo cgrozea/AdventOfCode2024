@@ -21,26 +21,10 @@ L=[V,Vafter,Vswap,Op,T1,T2,Name], %expand the info about the gate instance
 e(Vx,Vy,M,Swappers,T1,V1), %evaluate operand T1 to V1
 e(Vx,Vy,M,Swappers,T2,V2), %evaluate operand T2 to V2
 op(Op,V1,V2,V), %enforces the gate relation V=Op(V1,V2), where V is the value before swap
-(sum(Vswap)#=0)#/\(Vafter#=V) % when not involved in swaps, the value remains unchanged
-#\/ (sum(Vswap)#>0) #/\ 
-(Vswap[1] #/\ V#=Swappers[1] %a) when it participates in slot 1 ...
-#\/ Vswap[2] #/\ V#=Swappers[2] %b) when it participates in slot 2 ...
-#\/ Vswap[3] #/\ V#=Swappers[3] % and so on
-#\/ Vswap[4] #/\ V#=Swappers[4]
-#\/ Vswap[5] #/\ V#=Swappers[5]
-#\/ Vswap[6] #/\ V#=Swappers[6]
-#\/ Vswap[7] #/\ V#=Swappers[7]
-#\/ Vswap[8] #/\ V#=Swappers[8])
-#/\ ( %a) then it swaps with whatever value the gate participating in slot 2 produces
-Vswap[1]#/\ Vafter#=Swappers[2] 
-%b) then it swaps with whatever value the gate participating in slot 1 produces
-#\/ Vswap[2] #/\ Vafter#=Swappers[1] 
-#\/ Vswap[3] #/\ Vafter#=Swappers[4] % and so on
-#\/ Vswap[4] #/\ Vafter#=Swappers[3]
-#\/ Vswap[5] #/\ Vafter#=Swappers[6]
-#\/ Vswap[6] #/\ Vafter#=Swappers[5]
-#\/ Vswap[7] #/\ Vafter#=Swappers[8]
-#\/ Vswap[8] #/\ Vafter#=Swappers[7]).
+sum(Vswap)#=0 #=> Vafter#=V % when not involved in swaps, the value remains unchanged
+foreach(I in 1..8) % otherwise swaps 1 with 2, 3 with 4 and so on
+Vswap[I] #=> V#=Swappers[I] #/\ Vafter#=Swappers[1 + ((I-1)^1)] 
+end.
 
 % enforces the multibit binary addition constraint
 % on arbitrary length numbers X and Y
