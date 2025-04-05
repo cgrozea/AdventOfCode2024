@@ -21,7 +21,7 @@ L=[V,Vafter,Vswap,Op,T1,T2,Name], %expand the info about the gate instance
 e(Vx,Vy,M,Swappers,T1,V1), %evaluate operand T1 to V1
 e(Vx,Vy,M,Swappers,T2,V2), %evaluate operand T2 to V2
 op(Op,V1,V2,V), %enforces the gate relation V=Op(V1,V2), where V is the value before swap
-sum(Vswap)#=0 #=> Vafter#=V % when not involved in swaps, the value remains unchanged
+sum(Vswap)#=0 #=> Vafter#=V, % when not involved in swaps, the value remains unchanged
 foreach(I in 1..8) % otherwise swaps 1 with 2, 3 with 4 and so on
 Vswap[I] #=> V#=Swappers[I] #/\ Vafter#=Swappers[1 + ((I-1)^1)] 
 end.
