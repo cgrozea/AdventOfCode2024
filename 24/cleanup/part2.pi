@@ -1,6 +1,5 @@
 import util.
 import sat.
-p(A)=>println(A). %shorter alias
 op("OR",X,Y,R)=>R#=(X#\/Y).  %add OR constraint
 op("AND",X,Y,R)=>R#=(X#/\Y). %add AND constraint
 op("XOR",X,Y,R)=>R#=(X#^Y).  %add XOR constraint
@@ -98,11 +97,9 @@ end
 ,Ys=[X:X in W.keys,X[1]='y'].sort % "Y" symbols in order, LSB first
 ,Zs=[X:X in W.keys,X[1]='z'].sort % "Z" symbols in order, LSB first
 ,foreach(Rep in 1..Steps.to_int) %generate Steps random additions
-    p(Rep)    
-    ,Swappers=new_array(8),Swappers::0..1 %the values swapped
+    Swappers=new_array(8),Swappers::0..1 %the values swapped
     ,Vx:=[random(0,1):_ in Xs] %random X
     ,Vy:=[random(0,1):_ in Ys] %to add with random Y   
-    ,p({Vx,Vy})
     ,M:=new_map() % hashmap to store the definitions of the symbols
     ,foreach(L in A,L.length=2) % the constants
         M.put(L[1],[L[2].to_int]) % are stored as such
@@ -124,9 +121,7 @@ end
     ,Vz:=[R:X in Zs,e(Vx,Vy,M,Swappers,X,R)] 
     ,madd(0,Vx,Vy,Vz) % enforce Vx+Vy=Vz with suitable swaps
 end
-,p(solve)
 ,solve(Vpos) %solve the constraint problem
 %extract the names of the gates swapped
 ,Swappednames=[N:[_,_,V,_,_,_,N] in M.values,V.sum>0].sort 
-,p(Swappednames). %and display them after sort
-
+,println(Swappednames). %and display them after sort
