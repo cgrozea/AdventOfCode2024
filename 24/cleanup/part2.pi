@@ -12,7 +12,7 @@ if L=[_] then % input, either X or Y
 else L=[_,R|_] % a gate; return the value after the potential swap
 end.
 
-% constraint for gate behavior and potential swap after
+% constraint for gate behavior and potential swap afterwards
 add_gate_constr(K,M,Swappers,Vx,Vy,L), L=[V,Vafter,Vswap,Op,T1,T2,_]=>
 e(Vx,Vy,M,Swappers,T1,V1), e(Vx,Vy,M,Swappers,T2,V2), % evaluate operands Ti to Vi 
 op(Op,V1,V2,V), % enforces the gate relation V=Op(V1,V2), where V is the value before swap
