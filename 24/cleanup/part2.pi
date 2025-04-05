@@ -11,7 +11,7 @@ if L=[_] then
     if X[1]='x' then R=Vx[tail(X).to_int+1] % "X" input
     else if X[1]='y' then R=Vy[tail(X).to_int+1] % "Y" input
     end end
-else L=[_,Vafter|_],R=Vafter %whoever references a gate uses the value after a potential swap
+else L=[_,R|_] %whoever references a gate uses the value after the potential swap
 end.
 
 % constraint for gate behavior and potential swap after
