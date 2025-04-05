@@ -7,7 +7,7 @@ op("XOR",X,Y,R)=>R#=(X#^Y).  %add XOR constraint
 %evaluates X to a value or variable R using potential swaps
 e(Vx,Vy,M,Swappers,X,R)=> 
 L=M.get(X,[notfound]),
-if L=[R2] then
+if L=[_] then
     if X[1]='x' then R=Vx[tail(X).to_int+1] % "X" input
     else if X[1]='y' then R=Vy[tail(X).to_int+1] % "Y" input
     end end
