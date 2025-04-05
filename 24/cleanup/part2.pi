@@ -51,6 +51,11 @@ Vswap[1]#/\ Vafter#=Swappers[2]
 )
 .
 
+% enforces the multibit binary addition constraint
+% on arbitrary length numbers X and Y
+% with the result on Z (one bit longer than X and Y)
+% C is the carry
+% X+Y+C=Z
 madd(C,X,Y,Z)=>
 foreach(I in 1..X.length)
     Z[I] #= (X[I] #^ Y[I] #^ C),
@@ -59,10 +64,6 @@ foreach(I in 1..X.length)
     C:=D
 end,
 Z[Z.length]#=C.
-
-v(X)=R=>R=[X[I]*2**(I-1):I in 1..X.length].sum.
-
-check(X,Y,Z)=>v(X)+v(Y)=v(Z).
 
 % main entry point
 % command line parameters:
@@ -107,9 +108,9 @@ end
     sum([X[I]:X in Vpos])#=1 %every slot is used to swap the output of precisely one gate
 end
 ,sum([sum(X):X in Vpos])#=K %there are exactly K swapped gate outputs
-,Xs=[X:X in W.keys,X[1]='x'].sort % "X" symbols in order
-,Ys=[X:X in W.keys,X[1]='y'].sort % "Y" symbols in order
-,Zs=[X:X in W.keys,X[1]='z'].sort % "Z" symbols in order
+,Xs=[X:X in W.keys,X[1]='x'].sort % "X" symbols in order, LSB first
+,Ys=[X:X in W.keys,X[1]='y'].sort % "Y" symbols in order, LSB first
+,Zs=[X:X in W.keys,X[1]='z'].sort % "Z" symbols in order, LSB first
 ,p(lengths=[Xs,Ys,Zs].map(length))
 ,Ax:=random(42) % geeky random seed
 ,foreach(Rep in 1..Steps.to_int) %generate Steps random additions
