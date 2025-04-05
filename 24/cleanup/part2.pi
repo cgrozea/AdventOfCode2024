@@ -16,7 +16,7 @@ end.
 
 % constraint for gate behavior and potential swap after
 add_gate_constr(K,M,Swappers,Vx,Vy,L)=>
-L=[V,Vafter,Vswap,Op,T1,T2,Name], %expand the info about the gate instance
+L=[V,Vafter,Vswap,Op,T1,T2,_], %expand the info about the gate instance
 e(Vx,Vy,M,Swappers,T1,V1), %evaluate operand T1 to V1
 e(Vx,Vy,M,Swappers,T2,V2), %evaluate operand T2 to V2
 op(Op,V1,V2,V), %enforces the gate relation V=Op(V1,V2), where V is the value before swap
@@ -64,7 +64,6 @@ end
 ,SK=M.keys.sort
 ,SKN=SK.length
 ,Vpos=[V:I in 1..SKN,M.get(SK[I])=[_,_,V|_]] %all swapp flags
-,SG=[V:I in 1..SKN,M.get(SK[I])=[_,_,_,_,_,_,V]] %all symbols for gates
 ,foreach(X in Vpos)
     sum(X)#<=1 %every gate takes part in atmost one swap slot
 end
@@ -75,7 +74,7 @@ end
 ,Xs=[X:X in W.keys,X[1]='x'].sort % "X" symbols in order, LSB first
 ,Ys=[X:X in W.keys,X[1]='y'].sort % "Y" symbols in order, LSB first
 ,Zs=[X:X in W.keys,X[1]='z'].sort % "Z" symbols in order, LSB first
-,foreach(Rep in 1..Steps.to_int) %generate Steps random additions
+,foreach(_ in 1..Steps.to_int) %generate Steps random additions
     Swappers=new_array(8),Swappers::0..1 %the values swapped
     ,Vx:=[random(0,1):_ in Xs] %random X
     ,Vy:=[random(0,1):_ in Ys] %to add with random Y   
