@@ -5,7 +5,7 @@ op("OR",X,Y,R)=>R#=(X#\/Y).  %add OR constraint
 op("AND",X,Y,R)=>R#=(X#/\Y). %add AND constraint
 op("XOR",X,Y,R)=>R#=(X#^Y).  %add XOR constraint
 
-%evaluate X to a value R using potential swapps
+%evaluate X to a value R using potential swaps
 e(Vx,Vy,M,Swappers,X,R)=> 
 L=M.get(X,[notfound]),
 if L=[R2] then
@@ -28,7 +28,7 @@ L=[V,Vafter,Vswap,Op,T1,T2,Name], %expand the info about the gate instance
 e(Vx,Vy,M,Swappers,T1,V1), %evaluate operand T1 to V1
 e(Vx,Vy,M,Swappers,T2,V2), %evaluate operand T2 to V2
 op(Op,V1,V2,V), %enforces the gate relation V=Op(V1,V2), where V is the value before swap
-(sum(Vswap)#=0)#/\(Vafter#=V) % when not involved in swapps, the value remains unchanged
+(sum(Vswap)#=0)#/\(Vafter#=V) % when not involved in swaps, the value remains unchanged
 #\/ (sum(Vswap)#>0) #/\ 
 (
 Vswap[1] #/\ V#=Swappers[1] %a) when it participates in slot 1 ...
@@ -70,7 +70,7 @@ Z[Z.length]#=C.
 % main entry point
 % command line parameters:
 % - file name F
-% - number of gates involved in swapps (8 in the AoC problem)
+% - number of gates involved in swaps (8 in the AoC problem)
 % - for how many random additions to constrain the circuit to function correctly: Steps
 main([F,K0,Steps])=>
 A=[X.split(": "): X in read_file_lines(F)] %parse the symbols definitions in the input file
@@ -131,7 +131,7 @@ end
         add_gate_constr(M,Swappers,Vx,Vy,M.get(L[5])) %add a gate and potential swap constraint for every gate
     end    
     ,Vz:=[R:X in Zs,e(Vx,Vy,M,Swappers,X,R)] % collect the outputs of the "Z" gates on X and Y
-    ,madd(0,Vx,Vy,Vz) % enforce Vx+Vy=Vz with suitable swapps
+    ,madd(0,Vx,Vy,Vz) % enforce Vx+Vy=Vz with suitable swaps
 end
 ,p(solve)
 ,solve(Vpos) %solve the constraint problem
