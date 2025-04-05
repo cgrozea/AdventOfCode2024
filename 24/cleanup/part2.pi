@@ -88,7 +88,7 @@ end
     end,
     Vswap=new_array(8),Vswap::0..1, %if this variable is swapped with any of the slots
     VarSwaps.put(L[5],Vswap), %associate these flags with the variable
-    M.put(L[5],[_,_,_,L[2],L[1],L[3],L[5]]), %store the original gate info and the variables
+    M.put(L[5],[_,_,Vswap,L[2],L[1],L[3],L[5]]), %store the original gate info and the variables
     W.put(L[5]), %and make sure 
     W.put(L[1]), %the symbols involved 
     W.put(L[3])  %are collected
