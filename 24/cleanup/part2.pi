@@ -40,45 +40,45 @@ end, Z[Z.length]#=C.
 % - number of gates involved in swaps (8 in the AoC problem 24 from 2024)
 % - for how many random additions to constrain the circuit to function correctly: Steps
 main([F,K0,Steps])=>
-A=[X.split(": "): X in read_file_lines(F)] %parse the symbols definitions in the input file
-,M=new_map() %stores the informations from the input file as a map with symbol names as keys
-,W=new_set() %stores all symbol names
-,foreach(L in A,L.length=2) % process the definitions of the constants (circuit inputs)
+A=[X.split(": "): X in read_file_lines(F)], %parse the symbols definitions in the input file
+M=new_map(), %stores the informations from the input file as a map with symbol names as keys
+W=new_set(), %stores all symbol names
+foreach(L in A,L.length=2) % process the definitions of the constants (circuit inputs)
     M.put(L[1],[L[2].to_int]), W.put(L[1])
-end
+end,
 % stores the associated variable to a gate, the value after the potential swap
-,VarSwaps=new_map(45) 
-,foreach(L in A,L.length=5) % processes the definitions of the gates
+VarSwaps=new_map(45), 
+foreach(L in A,L.length=5) % processes the definitions of the gates
     % if this variable is swapped with any of the slots
     Vswap=new_array(8),Vswap::0..1, 
     VarSwaps.put(L[5],Vswap), % associate these flags with the variable
     % store the original gate info and the variables
     M.put(L[5],[_,_,Vswap,L[2],L[1],L[3],L[5]]), 
     W.put(L[5]), W.put(L[1]), W.put(L[3]) % collect the symbols involved
-end
-,K=K0.to_int
-,SK=M.keys.sort
-,SKN=SK.length
-,Vpos=[V:I in 1..SKN,M.get(SK[I])=[_,_,V|_]] %all swapp flags
-,foreach(X in Vpos)
+end,
+K=K0.to_int,
+SK=M.keys.sort,
+SKN=SK.length,
+Vpos=[V:I in 1..SKN,M.get(SK[I])=[_,_,V|_]], %all swapp flags
+foreach(X in Vpos)
     sum(X)#<=1 % every gate takes part in atmost one swap slot
-end
-,foreach(I in 1..K) % every slot is used to swap the output of precisely one gate
+end,
+foreach(I in 1..K) % every slot is used to swap the output of precisely one gate
     sum([X[I]:X in Vpos])#=1 
-end
-,sum([sum(X):X in Vpos])#=K % there are exactly K swapped gate outputs
-,Xs=[X:X in W.keys,X[1]='x'].sort % "X" symbols in order, LSB first
-,Ys=[X:X in W.keys,X[1]='y'].sort % "Y" symbols in order, LSB first
-,Zs=[X:X in W.keys,X[1]='z'].sort % "Z" symbols in order, LSB first
-,foreach(_ in 1..Steps.to_int) % generate Steps random additions
-    Swappers=new_array(8),Swappers::0..1 % the values swapped
-    ,Vx:=[random(0,1):_ in Xs] % random X
-    ,Vy:=[random(0,1):_ in Ys] % to add with random Y   
-    ,M:=new_map() % hashmap to store the definitions of the symbols
-    ,foreach(L in A,L.length=2) % the constants
+end,
+sum([sum(X):X in Vpos])#=K, % there are exactly K swapped gate outputs
+Xs=[X:X in W.keys,X[1]='x'].sort, % "X" symbols in order, LSB first
+Ys=[X:X in W.keys,X[1]='y'].sort, % "Y" symbols in order, LSB first
+Zs=[X:X in W.keys,X[1]='z'].sort, % "Z" symbols in order, LSB first
+foreach(_ in 1..Steps.to_int) % generate Steps random additions
+    Swappers=new_array(8),Swappers::0..1, % the values swapped
+    Vx:=[random(0,1):_ in Xs], % random X
+    Vy:=[random(0,1):_ in Ys], % to add with random Y   
+    M:=new_map(), % hashmap to store the definitions of the symbols
+    foreach(L in A,L.length=2) % the constants
         M.put(L[1],[L[2].to_int]) % are stored as such
-    end
-    ,foreach(L in A,L.length=5) % the gates
+    end,
+    foreach(L in A,L.length=5) % the gates
         V:=new_array(1),V::0..1,V:=V[1], % real output of the gate
         % output used after a potential swap
         Vafter:=new_array(1),Vafter::0..1,Vafter:=Vafter[1], 
@@ -86,16 +86,16 @@ end
         Vswap:=VarSwaps.get(L[5]), 
         % store all info needed later
         M.put(L[5],[V,Vafter,Vswap,L[2],L[1],L[3],L[5]]), 
-    end    
+    end,    
     %add a gate and potential swap constraint for every gate
-    ,foreach(L in A,L.length=5) 
+    foreach(L in A,L.length=5) 
         add_gate_constr(K,M,Swappers,Vx,Vy,M.get(L[5])) 
-    end    
+    end,   
     % collect the outputs of the "Z" gates on X and Y
-    ,Vz:=[R:X in Zs,e(Vx,Vy,M,Swappers,X,R)] 
-    ,madd(0,Vx,Vy,Vz) % enforce Vx+Vy=Vz with suitable swaps
-end
-,solve(Vpos) %solve the constraint problem
+    Vz:=[R:X in Zs,e(Vx,Vy,M,Swappers,X,R)], 
+    madd(0,Vx,Vy,Vz) % enforce Vx+Vy=Vz with suitable swaps
+end,
+solve(Vpos), %solve the constraint problem
 % extract the names of the gates swapped
-,Swappednames=[N:[_,_,V,_,_,_,N] in M.values,V.sum>0].sort 
-,println(Swappednames). %and display them ordered
+Swappednames=[N:[_,_,V,_,_,_,N] in M.values,V.sum>0].sort, 
+println(Swappednames). %and display them ordered
