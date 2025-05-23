@@ -5,7 +5,7 @@ import sat.
 % command line parameters:
 % - file name F
 % - number of gates involved in swaps (8 in the AoC problem 24 from 2024)
-% - for how many random additions to constrain the circuit to function correctly: Steps
+% - for how many random additions to constrain the circuit to function correctly: Steps (e.g. 10)
 main([F,K0,Steps])=>
 A=[X.split(": "): X in read_file_lines(F)], %parse the symbols definitions in the input file
 W=new_set([last(L): L in A, L.length==5] ++ [L[1]: L in A, L.length==2]),%stores all symbol names
