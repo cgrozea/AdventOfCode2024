@@ -8,7 +8,7 @@ import sat.
 % - for how many random additions to constrain the circuit to function correctly: Steps (e.g. 10)
 main([F,K0,Steps])=>
 A=[X.split(": "): X in read_file_lines(F)], %parse the symbols definitions in the input file
-W=new_set([last(L): L in A, L.length==5] ++ [L[1]: L in A]++[L[3]: L in A, L.length==5]),%stores all symbol names
+W=new_set([last(L): L in A, L.length==5] ++ [L[1]: L in A, L.length>0]++[L[3]: L in A, L.length==5]),%stores all symbol names
 K=K0.to_int,
 Gates=[L[5]: L in A, L.length=5],GateCount=Gates.length,
 GateIndex=new_map([Gates[I]=I:I in 1..GateCount]),% map gate names to their index
