@@ -5,7 +5,6 @@ import sat.
 % command line parameters:
 % - file name F
 % - number of gates involved in swaps (8 in the AoC problem 24 from 2024)
-% - for how many random additions to constrain the circuit to function correctly: Steps (e.g. 10)
 
 main([F,K0])=>
 Steps=10,
@@ -28,6 +27,8 @@ atleasttwosolutions([F,K0,Steps])=>
     Solution1!=Solution2,%redundant
     println(pair=(Solution1,Solution2)).
 
+% try to solve it by constraining with Steps random additions
+% and constrain that the solution is not the Forbidden one (if that's not empty)
 maintry([F,K0,Steps],Forbidden,Solution)=>
 A=[X.split(": "): X in read_file_lines(F)], %parse the symbols definitions in the input file
 %print([L:L in A, L.length==5]),
