@@ -19,6 +19,11 @@ N=N0.to_int,
 K=K0.to_int,
 C:=0,
 foreach (I in 0..N-1)
+p("grep "++v("x",I)++": 0"),
+p("grep "++v("y",I)++": 0"),
+end,
+p("grep "),
+foreach (I in 0..N-1)
     if I==0 then
         Z:=v("z",I),
         mxor(v("x",I),v("y",I),Z),
