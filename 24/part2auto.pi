@@ -1,0 +1,97 @@
+import util.
+import sat.
+
+% main entry point
+% command line parameters:
+% - file name F
+% - number of gates involved in swaps (8 in the AoC problem 24 from 2024)
+% - for how many random additions to constrain the circuit to function correctly: Steps (e.g. 10)
+
+main([F,K0])=>
+Steps=10,
+Count=many,
+while(Count!=1)
+    %Count:=count_all(maintry([F,K0,Steps],_)),
+    S0:=Steps,
+    if atleasttwosolutions([F,K0,Steps]) then
+        Steps:=Steps+10
+    else
+        Count:=1
+    end,
+    println([steps=S0,solutions=Count])
+end,
+maintry([F,K0,Steps],Solution),
+println(Solution).
+
+atleasttwosolutions([F,K0,Steps])=>
+    maintry([F,K0,Steps],Solution1),!,
+    maintry([F,K0,Steps],Solution2),
+    Solution1!=Solution2,
+    println(pair=(Solution1,Solution2)).
+
+maintry([F,K0,Steps],Solution)=>
+A=[X.split(": "): X in read_file_lines(F)], %parse the symbols definitions in the input file
+%print([L:L in A, L.length==5]),
+W=new_set([last(L): L in A, L.length==5] ++ [L[1]: L in A, L.length>0]++[L[3]: L in A, L.length==5]),%stores all symbol names
+K=K0.to_int,
+Gates=[L[5]: L in A, L.length=5],GateCount=Gates.length,
+GateIndex=new_map([Gates[I]=I:I in 1..GateCount]),% map gate names to their index
+Swapped=new_array(K),
+Swapped::1..GateCount, %the wires swapped pairwise: 1 with 2, 3 with 4 etc.
+all_different(Swapped), % every gate involved at most once in swaps
+Xs=[X:X in W.keys,X[1]='x'].sort, % "X" symbols in order, LSB first
+Ys=[X:X in W.keys,X[1]='y'].sort, % "Y" symbols in order, LSB first
+Zs=[X:X in W.keys,X[1]='z'].sort, % "Z" symbols in order, LSB first
+foreach(_ in 1..Steps.to_int) % generate Steps random additions
+    Swappers=new_array(K),Swappers::0..1, % the values swapped, one per slot
+    Vx:=[random(0,1):_ in Xs], % random X
+    Vy:=[random(0,1):_ in Ys], % to add with random Y   
+    Vars:=new_array(GateCount), Vars::0..1, %outputs of the gates
+    VarsAfter:=new_array(GateCount), Vars::0..1, %outputs of the gates, after being swapped     %add a gate and potential swap constraint for every gate
+    foreach(L in A,L.length=5) 
+        add_gate_constr(L,K,Swapped,Swappers,Vars,GateIndex,VarsAfter,Vx,Vy) 
+    end,  
+    % collect the outputs of the "Z" gates on X and Y
+    Vz:=[R:X in Zs,e(Vx,Vy,GateIndex,VarsAfter,X,R)],
+    madd(0,Vx,Vy,Vz) % enforce Vx+Vy=Vz with suitable swaps
+end,
+solve(Swapped),  %solve the constraint problem
+% extract the names of the gates swapped
+Swappednames=[Gates[I]:I in Swapped].sort,
+%println(Swappednames). %and display them ordered
+Solution=Swappednames.
+
+% constraint for gate behavior including potential swap afterwards
+add_gate_constr(L,K,Swapped,Swappers,Vars,GateIndex,VarsAfter,Vx,Vy), L=[T1,Op,T2,_,GateName]=>
+e(Vx,Vy,GateIndex,VarsAfter,T1,V1), e(Vx,Vy,GateIndex,VarsAfter,T2,V2), % evaluate operands Ti to Vi 
+ThisGateIndex=GateIndex.get(GateName),
+V=Vars[ThisGateIndex],Vafter=VarsAfter[ThisGateIndex],
+op(Op,V1,V2,V), % enforces the gate relation V=Op(V1,V2), where V is the value before swap
+foreach(I in 1..K) % swaps 1 with 2, 3 with 4 and so on
+Swapped[I]#=ThisGateIndex #=> V#=Swappers[I] #/\ Vafter#=Swappers[1 + ((I-1)^1)] 
+end,
+sum([Swapped[I]#=ThisGateIndex:I in 1..K])#=0 #=> Vafter#=V. % otherwise, when not involved in swaps, the value remains unchanged
+
+% evaluates X to a value or variable R using potential swaps
+e(Vx,Vy,GateIndex,VarsAfter,X,R)=> 
+if not has_key(GateIndex,X) then % input, either X or Y
+    Index=tail(X).to_int+1,if X[1]='x' then R=Vx[Index] else R=Vy[Index] end,
+else R=VarsAfter[GateIndex.get(X)]
+end.
+
+op("OR",X,Y,R)=>R#=(X#\/Y).  % add OR constraint
+op("AND",X,Y,R)=>R#=(X#/\Y). % add AND constraint
+op("XOR",X,Y,R)=>R#=(X#^Y).  % add XOR constraint
+
+% enforces the multibit binary addition constraint
+% on arbitrary length numbers X and Y
+% with the result on Z (one bit longer than X and Y)
+% C is the carry
+% X+Y+C=Z
+madd(C,X,Y,Z)=>
+foreach(I in 1..X.length)
+    Z[I] #= (X[I] #^ Y[I] #^ C),
+    D:=new_array(1),D::0..1,D:=D[1],
+    D#=((X[I] + Y[I] + C) #>= 2),
+    C:=D
+end, Z[Z.length]#=C.
