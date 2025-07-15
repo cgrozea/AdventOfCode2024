@@ -1,0 +1,76 @@
+import util.
+import sat.
+
+main([File])=>
+    read_input(File,Gates),
+    N = len(Gates),
+    Slots = new_array(8),
+    Slots :: 1..N,                            % each slot is mapped to a distinct gate
+    all_different(Slots),                     
+    NInputs = 40,                             % train the circuit using 40 random inputs
+    foreach(_ in 1..NInputs)                    
+        Vx := {random(0,1) : _ in 1..45},     % random input for X
+        Vy := {random(0,1) : _ in 1..45},     % random input for Y
+        Vz := new_array(45),
+        Vz :: 0..1,                           % output Z
+        add_gate_constrs(Gates,Slots,Vx,Vy,Vz),
+    end,
+    solve(Slots),
+    output(Slots, Gates).
+    
+add_gate_constrs(Gates,Slots,Vx,Vy,Vz)=>
+    Swappers=new_array(8),Swappers::0..1, % the values swapped, one per slot
+    GateCount=Gates.length,
+    GateIndex=new_map([Gates[I,5]=I:I in 1..GateCount]),% map gate names to their index
+    Vars:=new_array(GateCount), Vars::0..1, %outputs of the gates
+    VarsAfter:=new_array(GateCount), Vars::0..1, %outputs of the gates, after being swapped
+    %add a gate and potential swap constraint for every gate
+    foreach(L in Gates) 
+        add_gate_constr2(L,8,Slots,Swappers,Vars,GateIndex,VarsAfter,Vx,Vy) 
+    end,  
+    % collect the outputs of the "Z" gates on X and Y
+    Zs=[Z: Z in GateIndex.keys,Z[1]='z'].sort, % "Z" symbols in order, LSB first
+    Vz:=[R:X in Zs,e(Vx,Vy,GateIndex,VarsAfter,X,R)],
+    madd(0,Vx,Vy,Vz). % enforce Vx+Vy=Vz with suitable swaps
+    
+read_input(File,Gates)=>
+A=[X.split(": "): X in read_file_lines(File)], %parse the symbols definitions in the input file
+Gates=[L: L in A, L.length=5].
+
+output(Slots,Gates)=>println([Gates[I,5]:I in Slots].sort).
+    
+% constraint for gate behavior including potential swap afterwards
+add_gate_constr2(L,K,Swapped,Swappers,Vars,GateIndex,VarsAfter,Vx,Vy), L=[T1,Op,T2,_,GateName]=>
+e(Vx,Vy,GateIndex,VarsAfter,T1,V1), e(Vx,Vy,GateIndex,VarsAfter,T2,V2), % evaluate operands Ti to Vi 
+ThisGateIndex=GateIndex.get(GateName),
+V=Vars[ThisGateIndex],Vafter=VarsAfter[ThisGateIndex],
+op(Op,V1,V2,V), % enforces the gate relation V=Op(V1,V2), where V is the value before swap
+foreach(I in 1..K) % swaps 1 with 2, 3 with 4 and so on
+Swapped[I]#=ThisGateIndex #=> V#=Swappers[I] #/\ Vafter#=Swappers[1 + ((I-1)^1)] 
+end,
+sum([Swapped[I]#=ThisGateIndex:I in 1..K])#=0 #=> Vafter#=V
+. % otherwise, when not involved in swaps, the value remains unchanged
+
+% evaluates X to a value or variable R using potential swaps
+e(Vx,Vy,GateIndex,VarsAfter,X,R)=> 
+if not has_key(GateIndex,X) then % input, either X or Y
+    Index=tail(X).to_int+1,if X[1]='x' then R=Vx[Index] else R=Vy[Index] end,
+else R=VarsAfter[GateIndex.get(X)]
+end.
+
+op("OR",X,Y,R)=>R#=(X#\/Y).  % add OR constraint
+op("AND",X,Y,R)=>R#=(X#/\Y). % add AND constraint
+op("XOR",X,Y,R)=>R#=(X#^Y).  % add XOR constraint
+
+% enforces the multibit binary addition constraint
+% on arbitrary length numbers X and Y
+% with the result on Z (one bit longer than X and Y)
+% C is the carry
+% X+Y+C=Z
+madd(C,X,Y,Z)=>
+foreach(I in 1..X.length)
+    Z[I] #= (X[I] #^ Y[I] #^ C),
+    D:=new_array(1),D::0..1,D:=D[1],
+    D#=((X[I] + Y[I] + C) #>= 2),
+    C:=D
+end, Z[Z.length]#=C.
